@@ -42,30 +42,20 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            {/* Logo */}
+            {/* Real Full Brand Logo with Icon & Text */}
             <Link
               href="#hero"
-              className="flex items-center gap-3 group transition-all"
+              className="flex items-center group transition-all"
             >
-              {/* Official brand symbol */}
-              <div className="w-8 h-9 group-hover:scale-105 transition-transform flex-shrink-0 flex items-center justify-center">
+              <div className="h-10 sm:h-11 w-auto group-hover:scale-[1.02] transition-transform flex items-center">
                 <Image
-                  src="/brand-symbol-red.png"
-                  alt="Bextery Bites Symbol"
-                  width={32}
-                  height={37}
-                  className="w-auto h-8 object-contain"
+                  src="/brand-full-logo.png"
+                  alt="Bextery Bites - Dietitian-Crafted · Ibadan"
+                  width={218}
+                  height={48}
+                  className="h-9 sm:h-10 w-auto object-contain"
                   priority
                 />
-              </div>
-              <div className="flex flex-col">
-                <div className="flex items-baseline gap-1.5 font-display text-2xl font-bold text-brand-dark group-hover:text-brand-red transition-colors leading-none">
-                  <span>Bextery</span>
-                  <span className="font-body text-[10px] tracking-[0.3em] text-brand-brown font-semibold uppercase">BITES</span>
-                </div>
-                <span className="font-body text-[9px] text-brand-brown/80 tracking-wider uppercase mt-1 hidden sm:block">
-                  Dietitian-Crafted · Ibadan
-                </span>
               </div>
             </Link>
 

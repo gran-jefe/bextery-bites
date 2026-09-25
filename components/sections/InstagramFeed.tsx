@@ -20,8 +20,8 @@ const showcaseItems = [
   },
   {
     type: 'image',
-    src: '/brand-logo-full.jpg',
-    tag: 'Brand Philosophy',
+    src: '/brand-full-logo-cream.png',
+    tag: 'Brand Identity',
     title: 'Clinical Precision Meets Art',
     desc: 'Formulated by a Human Nutrition & Dietetics professional.',
   },

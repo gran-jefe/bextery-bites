@@ -34,19 +34,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           {/* Column 1 - Brand */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-9 h-10 flex-shrink-0 flex items-center justify-center">
-                <Image
-                  src="/brand-symbol-red.png"
-                  alt="Bextery Bites Symbol"
-                  width={36}
-                  height={42}
-                  className="w-auto h-9 object-contain"
-                />
-              </div>
-              <h3 className="font-display text-2xl font-bold text-white">
-                Bextery <span className="font-body text-xs tracking-[0.25em] text-brand-rose">BITES</span>
-              </h3>
+            <div className="mb-3">
+              <Image
+                src="/brand-full-logo-light.png"
+                alt="Bextery Bites - Dietitian-Crafted · Ibadan"
+                width={220}
+                height={48}
+                className="h-11 w-auto object-contain"
+              />
             </div>
             <p className="font-body italic text-brand-rose text-sm">
               Sumptuous feel in every nutritious bite
