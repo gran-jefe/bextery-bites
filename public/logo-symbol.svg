@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
+  <!-- Layer 1: Top rounded pill layer -->
+  <path d="M 54 36 C 54 27, 106 27, 106 36 C 106 45, 54 45, 54 36 Z" fill="currentColor"/>
+  <!-- Layer 2: Middle curved cake layer -->
+  <path d="M 44 64 C 44 52, 116 52, 116 64 C 116 76, 44 76, 44 64 Z" fill="currentColor"/>
+  <!-- Layer 3: Bottom curved swoosh base layer with distinctive reception tail -->
+  <path d="M 44 94 C 44 82, 120 82, 134 94 C 140 100, 134 116, 126 120 C 104 130, 48 132, 44 122 C 40 112, 44 94, 44 94 Z" fill="currentColor"/>
+</svg>

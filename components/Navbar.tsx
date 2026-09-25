@@ -44,15 +44,25 @@ export default function Navbar() {
             {/* Logo */}
             <Link
               href="#hero"
-              className="flex flex-col group transition-all"
+              className="flex items-center gap-3 group transition-all"
             >
-              <div className="flex items-center gap-1.5 font-display text-2xl font-bold text-brand-dark group-hover:text-brand-red transition-colors">
-                <span>Bextery</span>
-                <span className="font-body text-xs tracking-[0.25em] text-brand-red font-semibold">BITES</span>
+              {/* Official 3-tier cake layer mark */}
+              <div className="w-9 h-9 text-brand-red group-hover:scale-105 transition-transform flex-shrink-0">
+                <svg viewBox="0 0 160 160" fill="none" className="w-full h-full">
+                  <path d="M 54 36 C 54 27, 106 27, 106 36 C 106 45, 54 45, 54 36 Z" fill="currentColor"/>
+                  <path d="M 44 64 C 44 52, 116 52, 116 64 C 116 76, 44 76, 44 64 Z" fill="currentColor"/>
+                  <path d="M 44 94 C 44 82, 120 82, 134 94 C 140 100, 134 116, 126 120 C 104 130, 48 132, 44 122 C 40 112, 44 94, 44 94 Z" fill="currentColor"/>
+                </svg>
               </div>
-              <span className="font-body text-[10px] text-brand-brown tracking-wider uppercase hidden sm:block">
-                Dietitian-Crafted · Ibadan
-              </span>
+              <div className="flex flex-col">
+                <div className="flex items-baseline gap-1.5 font-display text-2xl font-bold text-brand-dark group-hover:text-brand-red transition-colors leading-none">
+                  <span>Bextery</span>
+                  <span className="font-body text-[10px] tracking-[0.3em] text-brand-brown font-semibold uppercase">BITES</span>
+                </div>
+                <span className="font-body text-[9px] text-brand-brown/80 tracking-wider uppercase mt-1 hidden sm:block">
+                  Dietitian-Crafted · Ibadan
+                </span>
+              </div>
             </Link>
 
             {/* Desktop Navigation */}

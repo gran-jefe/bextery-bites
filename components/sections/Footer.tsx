@@ -33,13 +33,23 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           {/* Column 1 - Brand */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 text-brand-red flex-shrink-0">
+                <svg viewBox="0 0 160 160" fill="none" className="w-full h-full">
+                  <path d="M 54 36 C 54 27, 106 27, 106 36 C 106 45, 54 45, 54 36 Z" fill="currentColor"/>
+                  <path d="M 44 64 C 44 52, 116 52, 116 64 C 116 76, 44 76, 44 64 Z" fill="currentColor"/>
+                  <path d="M 44 94 C 44 82, 120 82, 134 94 C 140 100, 134 116, 126 120 C 104 130, 48 132, 44 122 C 40 112, 44 94, 44 94 Z" fill="currentColor"/>
+                </svg>
+              </div>
               <h3 className="font-display text-2xl font-bold text-white">
-                Bextery <span className="font-body text-sm tracking-widest">BITES</span>
+                Bextery <span className="font-body text-xs tracking-[0.25em] text-brand-rose">BITES</span>
               </h3>
             </div>
-            <p className="font-body italic text-brand-rose">
+            <p className="font-body italic text-brand-rose text-sm">
               Sumptuous feel in every nutritious bite
+            </p>
+            <p className="text-xs text-brand-rose/70 font-body">
+              The base comes from being able to create unique things with your hands, dexterity.
             </p>
           </div>
 

@@ -35,12 +35,28 @@ export default function About() {
           {/* Left column - Visual Card */}
           <div className={`relative transition-all duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
             <div className="w-full bg-gradient-to-br from-[#9A684D] via-[#BD4935] to-[#4F4140] rounded-3xl p-8 text-brand-cream shadow-2xl relative overflow-hidden border border-brand-rose/20">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-2xl" />
+              {/* Subtle watermark of official Bextery mark */}
+              <div className="absolute -right-8 -bottom-8 w-48 h-48 opacity-10 text-white pointer-events-none">
+                <svg viewBox="0 0 160 160" fill="none" className="w-full h-full">
+                  <path d="M 54 36 C 54 27, 106 27, 106 36 C 106 45, 54 45, 54 36 Z" fill="currentColor"/>
+                  <path d="M 44 64 C 44 52, 116 52, 116 64 C 116 76, 44 76, 44 64 Z" fill="currentColor"/>
+                  <path d="M 44 94 C 44 82, 120 82, 134 94 C 140 100, 134 116, 126 120 C 104 130, 48 132, 44 122 C 40 112, 44 94, 44 94 Z" fill="currentColor"/>
+                </svg>
+              </div>
               
               <div className="relative z-10 space-y-6">
-                <span className="text-xs uppercase tracking-widest text-brand-rose font-semibold bg-white/10 px-3 py-1 rounded-full">
-                  The Founder's Journey
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs uppercase tracking-widest text-brand-rose font-semibold bg-white/10 px-3 py-1 rounded-full">
+                    The Founder's Journey
+                  </span>
+                  <div className="w-7 h-7 text-brand-rose/80">
+                    <svg viewBox="0 0 160 160" fill="none" className="w-full h-full">
+                      <path d="M 54 36 C 54 27, 106 27, 106 36 C 106 45, 54 45, 54 36 Z" fill="currentColor"/>
+                      <path d="M 44 64 C 44 52, 116 52, 116 64 C 116 76, 44 76, 44 64 Z" fill="currentColor"/>
+                      <path d="M 44 94 C 44 82, 120 82, 134 94 C 140 100, 134 116, 126 120 C 104 130, 48 132, 44 122 C 40 112, 44 94, 44 94 Z" fill="currentColor"/>
+                    </svg>
+                  </div>
+                </div>
                 
                 <h3 className="text-3xl font-display font-bold text-white leading-snug">
                   "It started in student hostels with a hand mixer, a single oven, and an obsession with pure flavor."
@@ -129,6 +145,12 @@ export default function About() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Signature brand guidelines double red line accent */}
+        <div className="mt-16 space-y-1.5 opacity-60">
+          <div className="h-0.5 w-full bg-brand-red" />
+          <div className="h-0.5 w-full bg-brand-red" />
         </div>
       </div>
     </section>

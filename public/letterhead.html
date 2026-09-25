@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bextery Bites - Official Letterhead</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: A4;
+      margin: 0;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #f3edea;
+      font-family: 'Poppins', sans-serif;
+      color: #4F4140;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .page {
+      background: #FFFFFF;
+      width: 210mm;
+      min-height: 297mm;
+      padding: 22mm 24mm 24mm 24mm;
+      position: relative;
+      box-shadow: 0 15px 35px rgba(79, 65, 64, 0.12);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Top Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 20px;
+    }
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo-mark {
+      width: 58px;
+      height: 58px;
+      color: #BD4935;
+    }
+    .brand-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: #4F4140;
+      line-height: 1;
+    }
+    .brand-title span {
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.28em;
+      color: #9A684D;
+      margin-left: 6px;
+    }
+    .brand-tagline {
+      font-size: 11px;
+      font-style: italic;
+      color: #9A684D;
+      margin-top: 5px;
+    }
+
+    .meta-right {
+      text-align: right;
+      font-size: 10px;
+      color: #4F4140;
+      line-height: 1.6;
+    }
+    .meta-right strong {
+      color: #BD4935;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Brand Signature Double Line */
+    .double-rule {
+      margin-top: 4px;
+      margin-bottom: 30px;
+    }
+    .rule-line {
+      height: 2px;
+      background-color: #BD4935;
+      margin-bottom: 3px;
+    }
+
+    /* Watermark */
+    .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 320px;
+      height: 320px;
+      color: #FAF3F1;
+      opacity: 0.8;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Content Area */
+    .content {
+      position: relative;
+      z-index: 1;
+      flex-grow: 1;
+      font-size: 13px;
+      line-height: 1.8;
+      color: #4F4140;
+    }
+    .letter-date {
+      font-size: 12px;
+      color: #9A684D;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .recipient {
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .recipient strong {
+      color: #4F4140;
+      font-size: 14px;
+    }
+    .subject {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #BD4935;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .body-paragraph {
+      margin-bottom: 16px;
+      text-align: justify;
+    }
+    .signoff {
+      margin-top: 36px;
+      line-height: 1.6;
+    }
+    .signature-space {
+      height: 48px;
+    }
+
+    /* Footer */
+    .footer {
+      position: relative;
+      z-index: 1;
+      margin-top: 40px;
+      padding-top: 16px;
+    }
+    .footer-rule {
+      margin-bottom: 12px;
+    }
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: #9A684D;
+    }
+    .pill {
+      display: inline-block;
+      padding: 3px 8px;
+      background: #FAF3F1;
+      border: 1px solid #D0B7B2;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 9px;
+      color: #BD4935;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Print styling */
+    @media print {
+      body {
+        background: transparent;
+        padding: 0;
+      }
+      .page {
+        box-shadow: none;
+        width: 100%;
+        min-height: 100vh;
+      }
+      .no-print {
+        display: none;
+      }
+    }
+
+    /* Screen Toolbar */
+    .toolbar {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #BD4935;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 9999px;
+      box-shadow: 0 8px 24px rgba(189, 73, 53, 0.4);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s, background 0.2s;
+      z-index: 100;
+    }
+    .toolbar:hover {
+      background: #9A684D;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+  <button class="toolbar no-print" onclick="window.print()">
+    🖨️ Print or Save as PDF
+  </button>
+
+  <div class="page">
+    <!-- Background Watermark -->
+    <div class="watermark">
+      <svg viewBox="0 0 160 160" fill="none" style="width: 100%; height: 100%;">
+        <path d="M 54 36 C 54 27, 106 27, 106 36 C 106 45, 54 45, 54 36 Z" fill="currentColor"/>
+        <path d="M 44 64 C 44 52, 116 52, 116 64 C 116 76, 44 76, 44 64 Z" fill="currentColor"/>
+        <path d="M 44 94 C 44 82, 120 82, 134 94 C 140 100, 134 116, 126 120 C 104 130, 48 132, 44 122 C 40 112, 44 94, 44 94 Z" fill="currentColor"/>
+      </svg>
+    </div>
+
+    <!-- Header Section -->
+    <div>
+      <div class="header">
+        <div class="brand-left">
+          <div class="logo-mark">
+            <svg viewBox="0 0 160 160" fill="none" style="width: 100%; height: 100%;">
+              <path d="M 54 36 C 54 27, 106 27, 106 36 C 106 45, 54 45, 54 36 Z" fill="currentColor"/>
+              <path d="M 44 64 C 44 52, 116 52, 116 64 C 116 76, 44 76, 44 64 Z" fill="currentColor"/>
+              <path d="M 44 94 C 44 82, 120 82, 134 94 C 140 100, 134 116, 126 120 C 104 130, 48 132, 44 122 C 40 112, 44 94, 44 94 Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title">Bextery <span>BITES</span></div>
+            <div class="brand-tagline">Sumptuous feel in every nutritious bite</div>
+          </div>
+        </div>
+
+        <div class="meta-right">
+          <strong>Bextery Confectionery & Nutrition Services</strong><br>
+          Ibadan, Oyo State, Nigeria<br>
+          Phone / WhatsApp: +234 808 948 0850<br>
+          Web: bexterybites.com.ng | X: @bextery_bites
+        </div>
+      </div>
+
+      <!-- Signature Double Line Motif -->
+      <div class="double-rule">
+        <div class="rule-line"></div>
+        <div class="rule-line"></div>
+      </div>
+    </div>
+
+    <!-- Editable / Printable Content Area -->
+    <div class="content" contenteditable="true">
+      <div class="letter-date">Date: 25th September, 2026</div>
+
+      <div class="recipient">
+        <strong>The Selection Committee</strong><br>
+        Muslim Zakawaat & Sodaqaat Foundation (MUZASAF)<br>
+        SME Growth & Support Initiative<br>
+        Lagos / Oyo State, Nigeria
+      </div>
+
+      <div class="subject">
+        RE: OFFICIAL SUBMISSION OF SME BUSINESS PROPOSAL (₦2,000,000 OPERATIONAL SUPPORT)
+      </div>
+
+      <p class="body-paragraph">
+        Dear Esteemed Committee Members,
+      </p>
+
+      <p class="body-paragraph">
+        On behalf of <strong>Bextery Bites</strong>, I am pleased to submit our formal business growth and operational scaling proposal under the MUZASAF SME Growth & Support Initiative.
+      </p>
+
+      <p class="body-paragraph">
+        Bextery Bites is an Ibadan-based food processing and specialized nutrition confectionery brand founded by a graduate of Human Nutrition and Dietetics with one year of intensive clinical dietetic hospital internship experience. We combine culinary craftsmanship with clinical evidence to produce high-demand everyday confectionery alongside certified low-glycemic, therapeutic baked diets for patients managing diabetes and lifestyle health conditions.
+      </p>
+
+      <p class="body-paragraph">
+        We are requesting ₦2,000,000 in direct operational machinery and inventory support to overcome our current equipment bottlenecks (commercial planetary mixer, gas deck oven, dedicated cold chain) and triple our weekly production capacity while creating direct youth employment in Ibadan.
+      </p>
+
+      <div class="signoff">
+        Sincerely,<br><br>
+        <div class="signature-space">
+          <strong style="color: #4F4140;">Aisha Lamidi</strong><br>
+          <span style="font-size: 11px; color: #9A684D;">Founder & Managing Director / Registered Dietitian (Candidate)</span><br>
+          <span style="font-size: 10px; color: #BD4935; font-weight: 600;">Bextery Bites</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="footer">
+      <div class="double-rule footer-rule">
+        <div class="rule-line"></div>
+        <div class="rule-line"></div>
+      </div>
+      <div class="footer-content">
+        <div>
+          <span class="pill">100% Halal & Pure (Tayyib)</span>
+          <span style="margin-left: 8px;">Dietitian Formulated · Handcrafted in Ibadan</span>
+        </div>
+        <div>
+          Bextery Bites © 2026 · Confidential & Proprietary
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

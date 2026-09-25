@@ -151,6 +151,11 @@ Please confirm availability and the invoice details. Thank you!`;
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-brand-dark mb-4">
             Our Two-Wing Menu
           </h2>
+          {/* Brand double line accent */}
+          <div className="w-24 mx-auto space-y-1 my-4 opacity-75">
+            <div className="h-0.5 w-full bg-brand-red" />
+            <div className="h-0.5 w-full bg-brand-red" />
+          </div>
           <p className="text-base sm:text-lg text-brand-brown font-body max-w-2xl mx-auto">
             Choose between our daily indulgence bestsellers and our dietitian-led clinical therapeutic line.
           </p>
