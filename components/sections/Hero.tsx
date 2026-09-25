@@ -9,7 +9,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="bg-brand-cream pt-28 sm:pt-32 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+      className="bg-brand-cream pt-20 sm:pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
     >
       {/* Background glow watermark */}
       <div

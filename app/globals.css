@@ -47,6 +47,7 @@ body::before {
   mix-blend-mode: overlay;
 }
 
-* {
-  position: relative;
+/* Universal base styling */
+*, ::before, ::after {
+  box-sizing: border-box;
 }
