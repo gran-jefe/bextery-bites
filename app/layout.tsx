@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 export const metadata: Metadata = {
   metadataBase: new URL("https://bexterybites.com.ng"),
   title: {
-    default: "Bextery Bites — Sumptuous Taste & Clinical Nutrition | Ibadan",
+    default: "Bextery Bites: Sumptuous Taste & Clinical Nutrition | Ibadan",
     template: "%s | Bextery Bites",
   },
   description:
@@ -27,14 +27,14 @@ export const metadata: Metadata = {
     locale: "en_NG",
     url: "https://bexterybites.com.ng",
     siteName: "Bextery Bites",
-    title: "Bextery Bites — Sumptuous feel in every nutritious bite",
+    title: "Bextery Bites: Sumptuous feel in every nutritious bite",
     description: "Handcrafted cakes and pastries in Ibadan. Nutritious, moist, and made to order.",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Bextery Bites — Handcrafted Pastries in Ibadan",
+        alt: "Bextery Bites - Handcrafted Pastries in Ibadan",
       },
     ],
   },
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@bextery_bites",
     creator: "@bextery_bites",
-    title: "Bextery Bites — Sumptuous feel in every nutritious bite",
+    title: "Bextery Bites: Sumptuous feel in every nutritious bite",
     description: "Handcrafted cakes and pastries in Ibadan. Nutritious, moist, and made to order.",
     images: ["/og-image.jpg"],
   },

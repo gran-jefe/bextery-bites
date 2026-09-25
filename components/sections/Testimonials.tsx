@@ -21,7 +21,7 @@ const testimonials = [
   },
   {
     name: 'Fatima K.',
-    review: "I've tried so many cake places. Bextery Bites is on another level. Nutritious and sumptuous – just like they promise.",
+    review: "I've tried so many cake places. Bextery Bites is on another level. Nutritious and sumptuous, just like they promise.",
     stars: 5,
   },
 ];
