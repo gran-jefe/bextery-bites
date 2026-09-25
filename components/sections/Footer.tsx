@@ -9,7 +9,6 @@ const navLinks = [
   { label: 'Bestsellers', href: '#menu' },
   { label: 'Clinical Nutrition', href: '#clinical' },
   { label: 'Our Story', href: '#about' },
-  { label: 'Vision & Scale', href: '#vision' },
   { label: 'How to Order', href: '#order' },
 ];
 
