@@ -36,11 +36,11 @@ export default function Footer() {
           <div className="space-y-4">
             <div className="mb-3">
               <Image
-                src="/brand-full-logo-light.png"
-                alt="Bextery Bites - Dietitian-Crafted · Ibadan"
-                width={220}
-                height={48}
-                className="h-11 w-auto object-contain"
+                src="/brand-real-logo-white.png"
+                alt="Bextery Bites"
+                width={180}
+                height={45}
+                className="h-10 w-auto object-contain"
               />
             </div>
             <p className="font-body italic text-brand-rose text-sm">

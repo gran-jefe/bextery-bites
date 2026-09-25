@@ -49,10 +49,10 @@ export default function Navbar() {
             >
               <div className="h-10 sm:h-11 w-auto group-hover:scale-[1.02] transition-transform flex items-center">
                 <Image
-                  src="/brand-full-logo.png"
-                  alt="Bextery Bites - Dietitian-Crafted · Ibadan"
-                  width={218}
-                  height={48}
+                  src="/brand-real-logo-colored.png"
+                  alt="Bextery Bites"
+                  width={180}
+                  height={45}
                   className="h-9 sm:h-10 w-auto object-contain"
                   priority
                 />
