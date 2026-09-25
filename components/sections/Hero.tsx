@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 
-const whatsappLink = 'https://wa.me/2348089480850';
+const whatsappLink = 'https://wa.me/2347067436817';
 
 export default function Hero() {
   return (
@@ -52,7 +53,7 @@ export default function Hero() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-3.5 pt-1">
             <a
-              href="https://wa.me/2348089480850?text=Hi%20Bextery%20Bites%2C%20I%20would%20like%20to%20order%20from%20your%20menu!"
+              href="https://wa.me/2347067436817?text=Hi%20Bextery%20Bites%2C%20I%20would%20like%20to%20order%20from%20your%20menu!"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center px-7 py-3.5 bg-brand-red text-white font-body font-semibold rounded-full hover:bg-brand-brown transition-all duration-200 shadow-md hover:shadow-warm text-xs sm:text-sm uppercase tracking-wider"
@@ -89,9 +90,8 @@ export default function Hero() {
         <div className="lg:col-span-5">
           <div className="relative mx-auto max-w-md bg-white p-5 sm:p-6 rounded-3xl shadow-xl border border-brand-rose/30">
             {/* Visual Header */}
-            <div className="h-56 sm:h-60 rounded-2xl bg-gradient-to-br from-[#BD4935] via-[#9A684D] to-[#4F4140] p-5 text-white flex flex-col justify-between relative overflow-hidden shadow-inner">
-              <div className="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-white/10 blur-xl" />
-              <div className="flex justify-between items-start">
+            <div className="rounded-2xl bg-gradient-to-br from-[#BD4935] via-[#9A684D] to-[#4F4140] p-5 sm:p-6 text-white flex flex-col justify-between relative overflow-hidden shadow-inner">
+              <div className="flex justify-between items-start z-10 mb-3">
                 <span className="text-[10px] uppercase tracking-widest bg-white/20 backdrop-blur-md px-3 py-1 rounded-full font-semibold">
                   Bestseller Spotlight
                 </span>
@@ -99,11 +99,38 @@ export default function Hero() {
                   Fresh Daily
                 </span>
               </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-display font-bold">Foil Cake & Parfait Drops</div>
-                <p className="text-xs text-brand-cream/90 font-body mt-1">
-                  Moist chocolate/velvet sponge layers paired with rich fruit-compote Greek yogurt
-                </p>
+
+              {/* Authentic Packaging Sticker Feature */}
+              <div className="flex items-center gap-4 my-2 z-10">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 drop-shadow-xl hover:scale-105 transition-transform duration-300">
+                  <Image
+                    src="/brand-sticker-round.png"
+                    alt="Bextery Bites Packaging Seal"
+                    width={96}
+                    height={96}
+                    className="w-full h-full object-contain"
+                    priority
+                  />
+                </div>
+                <div className="space-y-1">
+                  <div className="text-xl sm:text-2xl font-display font-bold leading-tight">
+                    Foil Cakes & Parfait Drops
+                  </div>
+                  <p className="text-xs text-brand-cream/90 font-body leading-relaxed">
+                    Moist chocolate and velvet sponge layers paired with rich fruit-compote Greek yogurt.
+                  </p>
+                </div>
+              </div>
+
+              {/* Subtle watermark in card background */}
+              <div className="absolute -right-6 -bottom-6 w-36 h-36 opacity-15 pointer-events-none">
+                <Image
+                  src="/brand-symbol-rose.png"
+                  alt="Watermark"
+                  width={144}
+                  height={166}
+                  className="w-full h-full object-contain"
+                />
               </div>
             </div>
 

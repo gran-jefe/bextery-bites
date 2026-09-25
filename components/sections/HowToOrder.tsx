@@ -23,7 +23,7 @@ const steps = [
   },
 ];
 
-const whatsappLink = 'https://wa.me/2348089480850?text=Hi%2C%20I%27d%20like%20to%20place%20an%20order%20with%20Bextery%20Bites.';
+const whatsappLink = 'https://wa.me/2347067436817?text=Hi%2C%20I%27d%20like%20to%20place%20an%20order%20with%20Bextery%20Bites.';
 
 export default function HowToOrder() {
   return (

@@ -125,7 +125,7 @@ export default function Menu() {
   };
 
   const generateWhatsAppUrl = () => {
-    if (!selectedProduct) return 'https://wa.me/2348089480850';
+    if (!selectedProduct) return 'https://wa.me/2347067436817';
 
     const message = `Hello Bextery Bites! 🍰
 I would like to order:
@@ -137,7 +137,7 @@ ${customerNote ? `• Special Request / Note: ${customerNote}` : ''}
 
 Please confirm availability and the invoice details. Thank you!`;
 
-    return `https://wa.me/2348089480850?text=${encodeURIComponent(message)}`;
+    return `https://wa.me/2347067436817?text=${encodeURIComponent(message)}`;
   };
 
   return (

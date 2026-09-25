@@ -5,7 +5,7 @@
 - **Tagline:** "Sumptuous feel in every nutritious bite"
 - **Mission:** Provide nutritious, moist, creamy, and sumptuous pastries
 - **Vision:** Become the most sought-after cake brand in Ibadan and beyond
-- **WhatsApp:** 08089480850
+- **WhatsApp:** 07067436817
 - **Twitter/X:** @bextery_bites
 
 ## Colors
@@ -32,7 +32,7 @@
 ## Structure
 - Single-page layout with smooth scroll sections
 - Sections: Hero, About, Menu, How to Order, Footer
-- All WhatsApp CTAs link to: https://wa.me/2348089480850
+- All WhatsApp CTAs link to: https://wa.me/2347067436817
 
 ## Notes
 - Mobile-first. All sections must be fully responsive.

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -36,12 +37,14 @@ export default function About() {
           <div className={`relative transition-all duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
             <div className="w-full bg-gradient-to-br from-[#9A684D] via-[#BD4935] to-[#4F4140] rounded-3xl p-8 text-brand-cream shadow-2xl relative overflow-hidden border border-brand-rose/20">
               {/* Subtle watermark of official Bextery mark */}
-              <div className="absolute -right-8 -bottom-8 w-48 h-48 opacity-10 text-white pointer-events-none">
-                <svg viewBox="0 0 160 160" fill="none" className="w-full h-full">
-                  <path d="M 54 36 C 54 27, 106 27, 106 36 C 106 45, 54 45, 54 36 Z" fill="currentColor"/>
-                  <path d="M 44 64 C 44 52, 116 52, 116 64 C 116 76, 44 76, 44 64 Z" fill="currentColor"/>
-                  <path d="M 44 94 C 44 82, 120 82, 134 94 C 140 100, 134 116, 126 120 C 104 130, 48 132, 44 122 C 40 112, 44 94, 44 94 Z" fill="currentColor"/>
-                </svg>
+              <div className="absolute -right-8 -bottom-8 w-48 h-48 opacity-15 pointer-events-none">
+                <Image
+                  src="/brand-symbol-rose.png"
+                  alt="Bextery Symbol Watermark"
+                  width={192}
+                  height={222}
+                  className="w-full h-full object-contain"
+                />
               </div>
               
               <div className="relative z-10 space-y-6">
@@ -49,12 +52,14 @@ export default function About() {
                   <span className="text-xs uppercase tracking-widest text-brand-rose font-semibold bg-white/10 px-3 py-1 rounded-full">
                     The Founder's Journey
                   </span>
-                  <div className="w-7 h-7 text-brand-rose/80">
-                    <svg viewBox="0 0 160 160" fill="none" className="w-full h-full">
-                      <path d="M 54 36 C 54 27, 106 27, 106 36 C 106 45, 54 45, 54 36 Z" fill="currentColor"/>
-                      <path d="M 44 64 C 44 52, 116 52, 116 64 C 116 76, 44 76, 44 64 Z" fill="currentColor"/>
-                      <path d="M 44 94 C 44 82, 120 82, 134 94 C 140 100, 134 116, 126 120 C 104 130, 48 132, 44 122 C 40 112, 44 94, 44 94 Z" fill="currentColor"/>
-                    </svg>
+                  <div className="w-7 h-8 flex items-center justify-center">
+                    <Image
+                      src="/brand-symbol-rose.png"
+                      alt="Bextery Symbol"
+                      width={28}
+                      height={32}
+                      className="w-auto h-7 object-contain opacity-80"
+                    />
                   </div>
                 </div>
                 

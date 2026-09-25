@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const navLinks = [
   { label: 'Bestsellers', href: '#menu' },
@@ -11,7 +12,7 @@ const navLinks = [
   { label: 'How to Order', href: '#order' },
 ];
 
-const whatsappLink = 'https://wa.me/2348089480850?text=Hi%20Bextery%20Bites%2C%20I%20would%20like%20to%20place%20an%20order%20or%20make%20an%20inquiry.';
+const whatsappLink = 'https://wa.me/2347067436817?text=Hi%20Bextery%20Bites%2C%20I%20would%20like%20to%20place%20an%20order%20or%20make%20an%20inquiry.';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -46,13 +47,16 @@ export default function Navbar() {
               href="#hero"
               className="flex items-center gap-3 group transition-all"
             >
-              {/* Official 3-tier cake layer mark */}
-              <div className="w-9 h-9 text-brand-red group-hover:scale-105 transition-transform flex-shrink-0">
-                <svg viewBox="0 0 160 160" fill="none" className="w-full h-full">
-                  <path d="M 54 36 C 54 27, 106 27, 106 36 C 106 45, 54 45, 54 36 Z" fill="currentColor"/>
-                  <path d="M 44 64 C 44 52, 116 52, 116 64 C 116 76, 44 76, 44 64 Z" fill="currentColor"/>
-                  <path d="M 44 94 C 44 82, 120 82, 134 94 C 140 100, 134 116, 126 120 C 104 130, 48 132, 44 122 C 40 112, 44 94, 44 94 Z" fill="currentColor"/>
-                </svg>
+              {/* Official brand symbol */}
+              <div className="w-8 h-9 group-hover:scale-105 transition-transform flex-shrink-0 flex items-center justify-center">
+                <Image
+                  src="/brand-symbol-red.png"
+                  alt="Bextery Bites Symbol"
+                  width={32}
+                  height={37}
+                  className="w-auto h-8 object-contain"
+                  priority
+                />
               </div>
               <div className="flex flex-col">
                 <div className="flex items-baseline gap-1.5 font-display text-2xl font-bold text-brand-dark group-hover:text-brand-red transition-colors leading-none">

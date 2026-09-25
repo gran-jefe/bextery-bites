@@ -17,24 +17,25 @@
       margin: 0;
       padding: 0;
     }
-    body {
-      background-color: #f3edea;
+    html, body {
+      width: 210mm;
+      height: 297mm;
+      background-color: #FFFFFF;
       font-family: 'Poppins', sans-serif;
       color: #4F4140;
-      display: flex;
-      justify-content: center;
-      padding: 40px 20px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
     .page {
-      background: #FFFFFF;
       width: 210mm;
-      min-height: 297mm;
-      padding: 22mm 24mm 24mm 24mm;
+      height: 297mm;
+      padding: 22mm 24mm 22mm 24mm;
       position: relative;
-      box-shadow: 0 15px 35px rgba(79, 65, 64, 0.12);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      overflow: hidden;
+      background: #FFFFFF;
     }
 
     /* Top Header */
@@ -99,7 +100,7 @@
       letter-spacing: 0.05em;
     }
 
-    /* Brand Signature Double Line with generous margin */
+    /* Brand Signature Double Red Line */
     .double-rule {
       margin-top: 12px;
       margin-bottom: 30px;
@@ -113,7 +114,7 @@
       margin-bottom: 3px;
     }
 
-    /* Watermark */
+    /* Watermark in center */
     .watermark {
       position: absolute;
       top: 52%;
@@ -134,58 +135,18 @@
       object-fit: contain;
     }
 
-    /* Content Area */
-    .content {
+    /* Blank Content Area */
+    .content-area {
+      flex-grow: 1;
       position: relative;
       z-index: 2;
-      flex-grow: 1;
-      font-size: 13px;
-      line-height: 1.8;
-      color: #4F4140;
-    }
-    .letter-date {
-      font-size: 12px;
-      color: #9A684D;
-      font-weight: 600;
-      margin-bottom: 24px;
-    }
-    .recipient {
-      margin-bottom: 24px;
-      line-height: 1.6;
-    }
-    .recipient strong {
-      color: #4F4140;
-      font-size: 14px;
-    }
-    .subject {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: #BD4935;
-      text-decoration: underline;
-      text-underline-offset: 4px;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-      letter-spacing: 0.02em;
-    }
-    .body-paragraph {
-      margin-bottom: 16px;
-      text-align: justify;
-    }
-    .signoff {
-      margin-top: 36px;
-      line-height: 1.6;
-    }
-    .signature-space {
-      height: 48px;
     }
 
     /* Footer */
     .footer {
       position: relative;
       z-index: 2;
-      margin-top: 40px;
-      padding-top: 16px;
+      padding-top: 14px;
     }
     .footer-rule {
       margin-bottom: 12px;
@@ -209,57 +170,12 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
-
-    /* Print styling */
-    @media print {
-      body {
-        background: transparent;
-        padding: 0;
-      }
-      .page {
-        box-shadow: none;
-        width: 100%;
-        min-height: 100vh;
-      }
-      .no-print {
-        display: none;
-      }
-    }
-
-    /* Screen Toolbar */
-    .toolbar {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: #BD4935;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 9999px;
-      box-shadow: 0 8px 24px rgba(189, 73, 53, 0.4);
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      border: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: transform 0.2s, background 0.2s;
-      z-index: 100;
-    }
-    .toolbar:hover {
-      background: #9A684D;
-      transform: translateY(-2px);
-    }
   </style>
 </head>
 <body>
 
-  <button class="toolbar no-print" onclick="window.print()">
-    🖨️ Print or Save as PDF
-  </button>
-
   <div class="page">
-    <!-- Background Watermark (Official Rose Symbol) -->
+    <!-- Background Watermark (Official Symbol Rose) -->
     <div class="watermark">
       <img src="brand-symbol-rose.png" alt="Bextery Symbol Watermark">
     </div>
@@ -285,53 +201,15 @@
         </div>
       </div>
 
-      <!-- Signature Double Line Motif with proper spacing -->
+      <!-- Signature Double Red Line Motif with generous clearance -->
       <div class="double-rule">
         <div class="rule-line"></div>
         <div class="rule-line"></div>
       </div>
     </div>
 
-    <!-- Editable / Printable Content Area -->
-    <div class="content" contenteditable="true">
-      <div class="letter-date">Date: 25th September, 2026</div>
-
-      <div class="recipient">
-        <strong>The Selection Committee</strong><br>
-        Muslim Zakawaat & Sodaqaat Foundation (MUZASAF)<br>
-        SME Growth & Support Initiative<br>
-        Lagos / Oyo State, Nigeria
-      </div>
-
-      <div class="subject">
-        RE: OFFICIAL SUBMISSION OF SME BUSINESS PROPOSAL (₦2,000,000 OPERATIONAL SUPPORT)
-      </div>
-
-      <p class="body-paragraph">
-        Dear Esteemed Committee Members,
-      </p>
-
-      <p class="body-paragraph">
-        On behalf of <strong>Bextery Bites</strong>, I am pleased to submit our formal business growth and operational scaling proposal under the MUZASAF SME Growth & Support Initiative.
-      </p>
-
-      <p class="body-paragraph">
-        Bextery Bites is an Ibadan-based food processing and specialized nutrition confectionery brand founded by a graduate of Human Nutrition and Dietetics with one year of intensive clinical dietetic hospital internship experience. We combine culinary craftsmanship with clinical evidence to produce high-demand everyday confectionery alongside certified low-glycemic, therapeutic baked diets for patients managing diabetes and lifestyle health conditions.
-      </p>
-
-      <p class="body-paragraph">
-        We are requesting ₦2,000,000 in direct operational machinery and inventory support to overcome our current equipment bottlenecks (commercial planetary mixer, gas deck oven, dedicated cold chain) and triple our weekly production capacity while creating direct youth employment in Ibadan.
-      </p>
-
-      <div class="signoff">
-        Sincerely,<br><br>
-        <div class="signature-space">
-          <strong style="color: #4F4140;">Aisha Lamidi</strong><br>
-          <span style="font-size: 11px; color: #9A684D;">Founder & Managing Director / Registered Dietitian (Candidate)</span><br>
-          <span style="font-size: 10px; color: #BD4935; font-weight: 600;">Bextery Bites</span>
-        </div>
-      </div>
-    </div>
+    <!-- Blank Body Writing Space -->
+    <div class="content-area"></div>
 
     <!-- Footer Section -->
     <div class="footer">
@@ -345,7 +223,7 @@
           <span style="margin-left: 8px;">Dietitian Formulated · Handcrafted in Ibadan</span>
         </div>
         <div>
-          Bextery Bites © 2026 · Confidential & Proprietary
+          Bextery Bites © 2026 · Official Document
         </div>
       </div>
     </div>

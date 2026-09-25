@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { MessageCircle, X as XIcon } from 'lucide-react';
 
 const currentYear = new Date().getFullYear();
@@ -16,7 +17,7 @@ const socialLinks = [
   {
     icon: MessageCircle,
     label: 'WhatsApp',
-    href: 'https://wa.me/2348089480850',
+    href: 'https://wa.me/2347067436817',
   },
   {
     icon: XIcon,
@@ -34,12 +35,14 @@ export default function Footer() {
           {/* Column 1 - Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 text-brand-red flex-shrink-0">
-                <svg viewBox="0 0 160 160" fill="none" className="w-full h-full">
-                  <path d="M 54 36 C 54 27, 106 27, 106 36 C 106 45, 54 45, 54 36 Z" fill="currentColor"/>
-                  <path d="M 44 64 C 44 52, 116 52, 116 64 C 116 76, 44 76, 44 64 Z" fill="currentColor"/>
-                  <path d="M 44 94 C 44 82, 120 82, 134 94 C 140 100, 134 116, 126 120 C 104 130, 48 132, 44 122 C 40 112, 44 94, 44 94 Z" fill="currentColor"/>
-                </svg>
+              <div className="w-9 h-10 flex-shrink-0 flex items-center justify-center">
+                <Image
+                  src="/brand-symbol-red.png"
+                  alt="Bextery Bites Symbol"
+                  width={36}
+                  height={42}
+                  className="w-auto h-9 object-contain"
+                />
               </div>
               <h3 className="font-display text-2xl font-bold text-white">
                 Bextery <span className="font-body text-xs tracking-[0.25em] text-brand-rose">BITES</span>
@@ -79,13 +82,13 @@ export default function Footer() {
             </h4>
             <div className="space-y-3">
               <a
-                href="https://wa.me/2348089480850"
+                href="https://wa.me/2347067436817"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 font-body text-brand-rose hover:text-white transition-colors"
               >
                 <MessageCircle size={16} />
-                08089480850
+                07067436817
               </a>
               <a
                 href="https://x.com/bextery_bites"
@@ -100,8 +103,14 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Signature Double Red Line Accent */}
+        <div className="space-y-1 mb-6">
+          <div className="h-[2px] bg-brand-red w-full" />
+          <div className="h-[1px] bg-brand-red/60 w-full" />
+        </div>
+
         {/* Bottom Bar */}
-        <div className="border-t border-brand-red/30 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm">
+        <div className="pt-2 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm">
           <p className="font-body text-brand-rose">
             © {currentYear} Bextery Bites. All rights reserved.
           </p>
