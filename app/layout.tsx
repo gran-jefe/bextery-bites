@@ -85,7 +85,11 @@ export default function RootLayout({
                 addressRegion: "Oyo State",
                 addressCountry: "NG",
               },
-              sameAs: ["https://x.com/bextery_bites"],
+              sameAs: [
+                "https://instagram.com/_bexterybites",
+                "https://www.tiktok.com/@bextery.bites",
+                "https://x.com/bextery_bites",
+              ],
               priceRange: "₦₦",
             }),
           }}

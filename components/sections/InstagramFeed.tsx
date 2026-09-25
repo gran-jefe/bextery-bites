@@ -61,31 +61,55 @@ export default function InstagramFeed() {
             Follow the Journey
           </div>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold mb-4">
-            @bextery_bites
+            @_bexterybites
           </h2>
           <p className="text-sm sm:text-base text-brand-rose font-body max-w-2xl mx-auto">
-            Fresh daily drops, behind the scenes from our Ibadan kitchen, and evidence-based nutrition tips.
+            Fresh daily drops, cake decorating behind-the-scenes, and nutrition tips on Instagram and TikTok.
           </p>
         </div>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-14">
+        <div className="flex flex-wrap justify-center gap-3.5 mb-14">
+          <a
+            href="https://instagram.com/_bexterybites"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-[#BD4935] to-[#9A684D] text-white font-body font-semibold rounded-full hover:opacity-95 transition-all shadow-md text-xs sm:text-sm uppercase tracking-wider"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+            </svg>
+            Instagram (@_bexterybites)
+          </a>
+          <a
+            href="https://www.tiktok.com/@bextery.bites"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center px-6 py-3 bg-black/60 border border-white/20 text-white font-body font-semibold rounded-full hover:bg-black/90 transition-all shadow-md text-xs sm:text-sm uppercase tracking-wider"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="mr-2">
+              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 3 15.68a6.34 6.34 0 0 0 10.86 4.43c1.7-1.7 1.8-4.28 1.8-6.19a9.66 9.66 0 0 0 5-1.42v-3.71a6.67 6.67 0 0 1-1.07-.1z"/>
+            </svg>
+            TikTok (@bextery.bites)
+          </a>
           <a
             href="https://x.com/bextery_bites"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center px-7 py-3.5 bg-brand-red text-white font-body font-semibold rounded-full hover:bg-brand-brown transition-all duration-200 shadow-md text-xs sm:text-sm uppercase tracking-wider"
+            className="inline-flex items-center justify-center px-6 py-3 border border-brand-rose/40 text-brand-cream font-body font-semibold rounded-full hover:bg-white/5 transition-all text-xs sm:text-sm uppercase tracking-wider"
           >
             <XIcon className="w-4 h-4 mr-2" />
-            Connect on X (@bextery_bites)
+            X (@bextery_bites)
           </a>
           <a
             href="https://wa.me/2347067436817?text=Hi%20Bextery%20Bites%2C%20I%20love%20your%20creations!"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center px-7 py-3.5 border-2 border-brand-rose/50 text-brand-cream font-body font-semibold rounded-full hover:bg-brand-rose/10 transition-all duration-200 text-xs sm:text-sm uppercase tracking-wider"
+            className="inline-flex items-center justify-center px-6 py-3 bg-brand-red text-white font-body font-semibold rounded-full hover:bg-brand-brown transition-all shadow-md text-xs sm:text-sm uppercase tracking-wider"
           >
-            WhatsApp Inquiry
+            WhatsApp
           </a>
         </div>
 
