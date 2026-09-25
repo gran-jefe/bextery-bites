@@ -32,13 +32,38 @@ export default function About() {
     >
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left column - Image placeholder */}
+          {/* Left column - Visual Card */}
           <div className={`relative transition-all duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-            <div className="w-full aspect-square bg-gradient-to-br from-brand-brown to-brand-rose rounded-3xl shadow-warm relative overflow-hidden">
-              {/* Floating badge */}
-              <div className="absolute bottom-6 right-6 bg-brand-red text-white rounded-full w-24 h-24 flex items-center justify-center flex-col font-body text-center shadow-warm">
-                <span className="text-xs font-medium tracking-widest">EST</span>
-                <span className="text-2xl font-display font-bold">2025</span>
+            <div className="w-full bg-gradient-to-br from-[#9A684D] via-[#BD4935] to-[#4F4140] rounded-3xl p-8 text-brand-cream shadow-2xl relative overflow-hidden border border-brand-rose/20">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-2xl" />
+              
+              <div className="relative z-10 space-y-6">
+                <span className="text-xs uppercase tracking-widest text-brand-rose font-semibold bg-white/10 px-3 py-1 rounded-full">
+                  The Founder's Journey
+                </span>
+                
+                <h3 className="text-3xl font-display font-bold text-white leading-snug">
+                  "It started in student hostels with a hand mixer, a single oven, and an obsession with pure flavor."
+                </h3>
+
+                <p className="text-sm font-body text-brand-cream/80 leading-relaxed">
+                  With a degree in Human Nutrition & Dietetics and a full year of intensive clinical dietetic experience in hospital wards, I observed firsthand how diabetic, hypertensive, and health-conscious Nigerians are completely excluded from celebratory treats. Modern confectionery in Nigeria had lost its conscience.
+                </p>
+
+                <div className="pt-4 border-t border-brand-rose/30 space-y-3 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="text-brand-red bg-white p-1 rounded-full text-xs font-bold">✓</span>
+                    <span><strong>Pure & Halal Ingredients:</strong> Zero potassium bromate, zero industrial saccharin.</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-brand-red bg-white p-1 rounded-full text-xs font-bold">✓</span>
+                    <span><strong>Clinical Science:</strong> Calibrated moisture & glycemic index awareness.</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-brand-red bg-white p-1 rounded-full text-xs font-bold">✓</span>
+                    <span><strong>100% Zero-Waste Goal:</strong> Cake offcuts repurposed into rich Greek yogurt parfaits.</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -46,38 +71,61 @@ export default function About() {
           {/* Right column - Content */}
           <div className={`space-y-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}>
             {/* Label */}
-            <div className="text-brand-rose font-body text-sm font-medium tracking-widest uppercase">
-              Our Story
+            <div className="text-brand-rose font-body text-xs font-semibold tracking-widest uppercase">
+              Our Identity & Purpose
             </div>
 
             {/* Heading */}
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-white">
-              Made with dexterity, served with love
+            <h2 className="text-4xl sm:text-5xl font-display font-bold text-white leading-tight">
+              Where artisan baking meets dietary therapy.
             </h2>
 
             {/* Body Copy */}
-            <div className="space-y-4 font-body text-brand-cream leading-relaxed">
+            <div className="space-y-4 font-body text-brand-cream/90 leading-relaxed text-sm sm:text-base">
               <p>
-                Bextery Bites was born from a simple belief — that great pastries should be both sumptuous
-                and nutritious. Every cake we make is handcrafted with quality ingredients, genuine care, and
-                a whole lot of creativity.
+                Bextery Bites was built on the belief that indulgence shouldn’t come at the cost of your health, and healthy pastries shouldn’t taste like cardboard.
               </p>
               <p>
-                Our mission is to curate pastries for anyone and everyone, regardless of health status or
-                dietary preference. We're building towards becoming the most sought-after cake brand in
-                Ibadan — one bite at a time.
+                Having baked for hundreds of students, families, and professionals across Ibadan, we are taking our craft to commercial scale: offering everyday celebratory treats alongside certified therapeutic baked diets for non-regular and health-restricted food consumers.
               </p>
             </div>
 
+            {/* 2 Wings Pillar Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <div className="p-4 rounded-2xl bg-white/5 border border-brand-rose/20 space-y-1">
+                <div className="text-brand-red text-xs font-bold uppercase tracking-wider">
+                  Wing A: The Indulgence Line
+                </div>
+                <div className="text-white font-display text-lg font-bold">
+                  Bestsellers & Celebrations
+                </div>
+                <p className="text-xs text-brand-rose">
+                  Foil cakes, rich chocolate fudge, moist red velvet, parfaits, and bespoke celebration cakes.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/5 border border-brand-rose/20 space-y-1">
+                <div className="text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                  Wing B: The Clinical Line
+                </div>
+                <div className="text-white font-display text-lg font-bold">
+                  Therapeutic & Functional
+                </div>
+                <p className="text-xs text-brand-rose">
+                  Low-GI, diabetic-friendly, high-fiber, and gluten-safe bakes formulated with indigenous grains.
+                </p>
+              </div>
+            </div>
+
             {/* Stats */}
-            <div className="grid grid-cols-2 gap-8 pt-8">
+            <div className="grid grid-cols-2 gap-8 pt-4 border-t border-brand-rose/20">
               <div className="border-l-2 border-brand-red pl-4">
-                <div className="text-4xl font-display font-bold text-brand-red">500+</div>
-                <p className="text-brand-rose text-sm font-body mt-2">Orders Delivered</p>
+                <div className="text-3xl font-display font-bold text-brand-red">500+</div>
+                <p className="text-brand-rose text-xs font-body mt-1">Orders Handcrafted in Ibadan</p>
               </div>
               <div className="border-l-2 border-brand-red pl-4">
-                <div className="text-4xl font-display font-bold text-brand-red">100%</div>
-                <p className="text-brand-rose text-sm font-body mt-2">Handcrafted</p>
+                <div className="text-3xl font-display font-bold text-brand-red">100%</div>
+                <p className="text-brand-rose text-xs font-body mt-1">Scientific Recipe Balance</p>
               </div>
             </div>
           </div>

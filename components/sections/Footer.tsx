@@ -6,9 +6,10 @@ import { MessageCircle, X as XIcon } from 'lucide-react';
 const currentYear = new Date().getFullYear();
 
 const navLinks = [
-  { label: 'Hero', href: '#hero' },
-  { label: 'About', href: '#about' },
-  { label: 'Menu', href: '#menu' },
+  { label: 'Bestsellers', href: '#menu' },
+  { label: 'Clinical Nutrition', href: '#clinical' },
+  { label: 'Our Story', href: '#about' },
+  { label: 'Vision & Scale', href: '#vision' },
   { label: 'How to Order', href: '#order' },
 ];
 

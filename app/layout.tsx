@@ -3,18 +3,22 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://bexterybites.com.ng"),
   title: {
-    default: "Bextery Bites — Sumptuous feel in every nutritious bite",
+    default: "Bextery Bites — Sumptuous Taste & Clinical Nutrition | Ibadan",
     template: "%s | Bextery Bites",
   },
   description:
-    "Handcrafted cakes and pastries in Ibadan. Nutritious, moist, and made to order. Order via WhatsApp.",
+    "Handcrafted cakes, foil cakes, parfaits, and clinical nutrition pastries in Ibadan. Formulated by a Human Nutrition & Dietetics professional. 100% Halal & Pure.",
   keywords: [
     "cakes ibadan",
-    "pastries ibadan",
-    "custom cakes nigeria",
+    "foil cake ibadan",
+    "diabetic cake nigeria",
+    "healthy pastries ibadan",
+    "parfait in ibadan",
+    "red velvet cake ibadan",
     "bextery bites",
-    "order cake whatsapp ibadan",
+    "dietitian baker nigeria",
   ],
   authors: [{ name: "Bextery Bites" }],
   creator: "Bextery Bites",
