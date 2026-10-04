@@ -78,7 +78,7 @@ export default function Testimonials() {
               }}
             >
               {/* Quote Mark */}
-              <div className="text-4xl text-brand-red font-display mb-4">"</div>
+              <div className="text-4xl text-brand-red font-display mb-4">&ldquo;</div>
 
               {/* Review Text */}
               <p className="text-brand-dark font-body text-sm mb-4 leading-relaxed">

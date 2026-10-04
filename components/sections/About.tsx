@@ -50,7 +50,7 @@ export default function About() {
               <div className="relative z-10 space-y-6">
                 <div className="flex items-center justify-between">
                   <span className="text-xs uppercase tracking-widest text-brand-rose font-semibold bg-white/10 px-3 py-1 rounded-full">
-                    The Founder's Journey
+                    The Founder&apos;s Journey
                   </span>
                   <div className="w-7 h-8 flex items-center justify-center">
                     <Image
@@ -64,7 +64,7 @@ export default function About() {
                 </div>
                 
                 <h3 className="text-3xl font-display font-bold text-white leading-snug">
-                  "It started in student hostels with a hand mixer, a single oven, and an obsession with pure flavor."
+                  &ldquo;It started in student hostels with a hand mixer, a single oven, and an obsession with pure flavor.&rdquo;
                 </h3>
 
                 <p className="text-sm font-body text-brand-cream/80 leading-relaxed">
