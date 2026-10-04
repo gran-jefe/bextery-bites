@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 const navLinks = [
   { label: 'Bestsellers', href: '#menu' },
@@ -15,6 +16,7 @@ const navLinks = [
 const whatsappLink = 'https://wa.me/2347067436817?text=Hi%20Bextery%20Bites%2C%20I%20would%20like%20to%20place%20an%20order%20or%20make%20an%20inquiry.';
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -26,6 +28,11 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Do not render website navbar on admin dashboard pages
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   const handleNavClick = () => {
     setIsMobileMenuOpen(false);

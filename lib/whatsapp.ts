@@ -109,19 +109,41 @@ export function parseContactsCsv(csvText: string): Contact[] {
   const contacts: Contact[] = [];
 
   dataRows.forEach((row, index) => {
-    if (row.length < 2 && !row[0]) return;
+    if (row.length === 0 || (row.length === 1 && !row[0])) return;
 
-    let rawName = (row[nameColIdx] || '').trim();
-    let rawPhone = (row[phoneColIdx] || '').trim();
+    let colA = (row[0] || '').trim();
+    let colB = (row[1] || '').trim();
 
-    // If only one column or flipped
-    if (!rawPhone && rawName && /\d{7,}/.test(rawName)) {
-      rawPhone = rawName;
-      rawName = `Valued Customer ${index + 1}`;
+    // If no delimiter was found and line has "09061770885 Sherif"
+    if (row.length === 1 && colA.includes(' ')) {
+      const parts = colA.split(/\s+/);
+      if (parts.length >= 2) {
+        if (/^\+?\d[\d\s-]{6,}$/.test(parts[0])) {
+          colA = parts[0];
+          colB = parts.slice(1).join(' ');
+        } else if (/^\+?\d[\d\s-]{6,}$/.test(parts[parts.length - 1])) {
+          colB = parts[parts.length - 1];
+          colA = parts.slice(0, -1).join(' ');
+        }
+      }
     }
 
-    if (!rawName) {
-      rawName = `Customer ${index + 1}`;
+    let rawName = '';
+    let rawPhone = '';
+
+    // Smart detection: determine which column is the phone number
+    const isColAPhone = /^\+?\d[\d\s-]{6,}$/.test(colA.replace(/[\s-]/g, ''));
+    const isColBPhone = /^\+?\d[\d\s-]{6,}$/.test(colB.replace(/[\s-]/g, ''));
+
+    if (isColAPhone && !isColBPhone) {
+      rawPhone = colA;
+      rawName = colB || `Customer ${index + 1}`;
+    } else if (isColBPhone && !isColAPhone) {
+      rawName = colA || `Customer ${index + 1}`;
+      rawPhone = colB;
+    } else {
+      rawName = (row[nameColIdx] || '').trim() || `Customer ${index + 1}`;
+      rawPhone = (row[phoneColIdx] || '').trim();
     }
 
     const { phone, isValid } = formatPhoneNumber(rawPhone);

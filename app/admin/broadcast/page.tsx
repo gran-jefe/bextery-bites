@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useId } from 'react';
+import React, { useState, useId, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import {
   Upload,
@@ -16,10 +16,13 @@ import {
   Copy,
   Check,
   Play,
+  Pause,
+  SkipForward,
   RotateCcw,
   MessageSquare,
   Sparkles,
   PhoneCall,
+  Zap,
 } from 'lucide-react';
 import {
   Contact,
@@ -51,6 +54,11 @@ export default function WhatsAppBroadcastPage() {
   const [isSending, setIsSending] = useState(false);
   const [currentSendIndex, setCurrentSendIndex] = useState<number | null>(null);
   const [sendLogs, setSendLogs] = useState<Array<{ time: string; text: string; type: 'info' | 'success' | 'error' }>>([]);
+
+  // 1-Click Queue Auto-Runner State
+  const [runnerActive, setRunnerActive] = useState(false);
+  const [runnerIndex, setRunnerIndex] = useState(0);
+  const [autoAdvanceSpeed, setAutoAdvanceSpeed] = useState<number>(0); // 0 = manual/spacebar, 3, 5, 8 = auto seconds
 
   // API Credentials (Optional override from Settings)
   const [credentials, setCredentials] = useState({
@@ -89,13 +97,11 @@ export default function WhatsAppBroadcastPage() {
   // Sample contacts loader for quick testing
   const loadSampleContacts = () => {
     const sample = `Name,Phone
-Amaka Adeleke,07067436817
-Babatunde Ojo,08031234567
-Chioma Eze,09023456789
-David Alabi,+2348123456789`;
+Sherif,09061770885
+Bextery,07067436817`;
     const parsed = parseContactsCsv(sample);
     setContacts(parsed);
-    addLog('Loaded 4 demo contacts for preview testing', 'info');
+    addLog('Loaded sample contacts: Sherif and Bextery', 'info');
   };
 
   const addLog = (text: string, type: 'info' | 'success' | 'error' = 'info') => {
@@ -110,9 +116,106 @@ David Alabi,+2348123456789`;
   };
 
   // Helper to compile the personalized message
-  const getCompiledMessage = (name: string) => {
+  const getCompiledMessage = useCallback((name: string) => {
     return messageTemplate.replace(/\{name\}/gi, name || 'Valued Customer');
+  }, [messageTemplate]);
+
+  // Advance Auto-Runner: Opens current WhatsApp chat, marks sent, moves to next
+  const sendAndAdvanceRunner = useCallback(() => {
+    if (contacts.length === 0) return;
+
+    const currentContact = contacts[runnerIndex];
+    if (currentContact && currentContact.isValid) {
+      const compiledMsg = getCompiledMessage(currentContact.name);
+      const waLink = generateWaMeLink(currentContact.phone, compiledMsg);
+      window.open(waLink, '_blank');
+
+      setContacts((prev) =>
+        prev.map((c, idx) => (idx === runnerIndex ? { ...c, status: 'sent' } : c))
+      );
+      addLog(`✓ Opened chat for ${currentContact.name} (${currentContact.phone})`, 'success');
+    }
+
+    // Find next contact that is valid and not yet sent
+    const nextIdx = contacts.findIndex(
+      (c, idx) => idx > runnerIndex && c.isValid && c.status !== 'sent'
+    );
+
+    if (nextIdx !== -1) {
+      setRunnerIndex(nextIdx);
+    } else {
+      // Check if there are any remaining unsent before current runnerIndex
+      const anyRemaining = contacts.findIndex((c) => c.isValid && c.status !== 'sent');
+      if (anyRemaining !== -1 && anyRemaining !== runnerIndex) {
+        setRunnerIndex(anyRemaining);
+      } else {
+        setRunnerActive(false);
+        addLog('🎉 1-Click Bulk Queue Completed! All contacts have been reached.', 'success');
+      }
+    }
+  }, [contacts, runnerIndex, getCompiledMessage]);
+
+  // Start the Auto-Runner
+  const startRunner = () => {
+    const firstPendingIdx = contacts.findIndex((c) => c.isValid && c.status !== 'sent');
+    if (firstPendingIdx === -1) {
+      alert('All contacts are already marked as sent! Click "Reset Queue" to start over.');
+      return;
+    }
+    setRunnerIndex(firstPendingIdx);
+    setRunnerActive(true);
+    addLog(`Started Auto-Runner queue at contact #${firstPendingIdx + 1}`, 'info');
   };
+
+  // Skip current contact
+  const skipRunnerContact = () => {
+    const nextIdx = contacts.findIndex(
+      (c, idx) => idx > runnerIndex && c.isValid && c.status !== 'sent'
+    );
+    if (nextIdx !== -1) {
+      setRunnerIndex(nextIdx);
+    } else {
+      setRunnerActive(false);
+      addLog('Reached end of contacts queue', 'info');
+    }
+  };
+
+  // Reset all statuses in 1-Click Queue
+  const resetQueueStatuses = () => {
+    setContacts((prev) => prev.map((c) => ({ ...c, status: 'idle' })));
+    setRunnerActive(false);
+    setRunnerIndex(0);
+    addLog('Reset all contact statuses in queue to pending', 'info');
+  };
+
+  // Keyboard shortcut listener for Spacebar / Enter
+  useEffect(() => {
+    if (!runnerActive || activeTab !== 'wa_me_queue') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
+      if (e.code === 'Space' || e.key === 'Enter') {
+        e.preventDefault();
+        sendAndAdvanceRunner();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [runnerActive, activeTab, sendAndAdvanceRunner]);
+
+  // Auto-advance timer listener
+  useEffect(() => {
+    if (!runnerActive || autoAdvanceSpeed === 0 || activeTab !== 'wa_me_queue') return;
+
+    const timer = setTimeout(() => {
+      sendAndAdvanceRunner();
+    }, autoAdvanceSpeed * 1000);
+
+    return () => clearTimeout(timer);
+  }, [runnerActive, autoAdvanceSpeed, activeTab, runnerIndex, sendAndAdvanceRunner]);
 
   // Automated Meta Cloud API Broadcast Sender
   const startMetaBroadcast = async () => {
@@ -629,70 +732,243 @@ David Alabi,+2348123456789`;
                   </button>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead>
-                      <tr className="border-b border-[#D0B7B2]/40 bg-[#FAF3F1]/60 text-[#4F4140]">
-                        <th className="p-3 font-bold">#</th>
-                        <th className="p-3 font-bold">Name</th>
-                        <th className="p-3 font-bold">Phone Number</th>
-                        <th className="p-3 font-bold">Personalized Message Preview</th>
-                        <th className="p-3 font-bold text-right">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {contacts.map((contact, idx) => {
-                        const compiledMsg = getCompiledMessage(contact.name);
-                        const waLink = generateWaMeLink(contact.phone, compiledMsg);
+                <div className="space-y-4">
+                  {/* Bulk Auto-Runner Control Deck */}
+                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#FAF3F1] to-white border border-[#D0B7B2]/60 shadow-xs space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-xl bg-[#BD4935] text-white flex items-center justify-center shadow-xs">
+                          <Zap className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-sm text-[#4F4140] flex items-center gap-2">
+                            Bulk Auto-Runner Controller
+                            {runnerActive && (
+                              <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold animate-pulse">
+                                RUNNING
+                              </span>
+                            )}
+                          </h3>
+                          <p className="text-[11px] text-[#9A684D]">
+                            Blast through your contacts sequentially with pre-filled personalized messages
+                          </p>
+                        </div>
+                      </div>
 
-                        return (
-                          <tr key={contact.id} className="hover:bg-gray-50 transition">
-                            <td className="p-3 text-gray-400 font-mono">{idx + 1}</td>
-                            <td className="p-3 font-bold text-[#4F4140]">{contact.name}</td>
-                            <td className="p-3 font-mono text-gray-600">
-                              {contact.phone || contact.rawPhone}
-                              {!contact.isValid && (
-                                <span className="ml-1 text-[10px] text-red-500">(invalid)</span>
-                              )}
-                            </td>
-                            <td className="p-3 text-gray-600 max-w-md truncate" title={compiledMsg}>
-                              {compiledMsg}
-                            </td>
-                            <td className="p-3 text-right">
-                              <div className="flex items-center justify-end gap-2">
-                                <button
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(compiledMsg);
-                                    setCopiedLinkIndex(idx);
-                                    setTimeout(() => setCopiedLinkIndex(null), 2000);
-                                  }}
-                                  title="Copy personalized text"
-                                  className="p-1.5 text-gray-400 hover:text-[#4F4140] rounded-md transition"
-                                >
-                                  {copiedLinkIndex === idx ? (
-                                    <Check className="w-3.5 h-3.5 text-emerald-600" />
-                                  ) : (
-                                    <Copy className="w-3.5 h-3.5" />
-                                  )}
-                                </button>
+                      {/* Speed / Mode Switcher */}
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-gray-500 font-medium">Advance Mode:</span>
+                        <select
+                          value={autoAdvanceSpeed}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            setAutoAdvanceSpeed(val);
+                          }}
+                          className="px-2.5 py-1.5 bg-white border border-[#D0B7B2]/70 rounded-xl text-xs font-semibold text-[#4F4140] focus:ring-2 focus:ring-[#BD4935]/30 focus:outline-hidden"
+                        >
+                          <option value={0}>⌨️ Manual (Spacebar / Enter)</option>
+                          <option value={3}>⚡ Auto (3 seconds delay)</option>
+                          <option value={5}>⏱️ Auto (5 seconds delay)</option>
+                          <option value={8}>🐢 Auto (8 seconds delay)</option>
+                        </select>
+                      </div>
+                    </div>
 
-                                <a
-                                  href={waLink}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#25D366] hover:bg-[#1EBE5D] text-white rounded-lg font-semibold text-xs transition shadow-xs"
-                                >
-                                  <PhoneCall className="w-3 h-3" />
-                                  Chat with {contact.name.split(' ')[0]}
-                                  <ExternalLink className="w-2.5 h-2.5 opacity-70" />
-                                </a>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                    {/* Progress Bar & Counters */}
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-xs font-semibold text-[#4F4140]">
+                        <span>Queue Progress: {contacts.filter((c) => c.status === 'sent').length} of {contacts.length} sent</span>
+                        <span className="text-[#BD4935]">
+                          {contacts.length > 0
+                            ? Math.round((contacts.filter((c) => c.status === 'sent').length / contacts.length) * 100)
+                            : 0}%
+                        </span>
+                      </div>
+                      <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-[#BD4935] transition-all duration-300 rounded-full"
+                          style={{
+                            width: `${
+                              contacts.length > 0
+                                ? (contacts.filter((c) => c.status === 'sent').length / contacts.length) * 100
+                                : 0
+                            }%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Action Controls */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                      {!runnerActive ? (
+                        <div className="flex flex-wrap items-center gap-3">
+                          <button
+                            onClick={startRunner}
+                            className="px-5 py-2.5 bg-[#BD4935] hover:bg-[#a63e2c] text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer"
+                          >
+                            <Play className="w-4 h-4 fill-white" />
+                            Start Bulk Auto-Runner
+                          </button>
+                          <button
+                            onClick={resetQueueStatuses}
+                            className="px-3.5 py-2 bg-white border border-[#D0B7B2]/70 hover:bg-gray-50 text-gray-700 font-semibold text-xs rounded-xl transition flex items-center gap-1.5"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                            Reset All to Pending
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                          <button
+                            onClick={sendAndAdvanceRunner}
+                            className="px-5 py-2.5 bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer animate-bounce"
+                          >
+                            <PhoneCall className="w-4 h-4" />
+                            Open WhatsApp & Next (Spacebar / Enter)
+                            {autoAdvanceSpeed > 0 && (
+                              <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white/20 text-[10px]">
+                                {autoAdvanceSpeed}s auto
+                              </span>
+                            )}
+                          </button>
+                          <button
+                            onClick={skipRunnerContact}
+                            className="px-3.5 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold text-xs rounded-xl transition flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <SkipForward className="w-3.5 h-3.5" />
+                            Skip
+                          </button>
+                          <button
+                            onClick={() => setRunnerActive(false)}
+                            className="px-3.5 py-2 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-semibold text-xs rounded-xl transition flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <Pause className="w-3.5 h-3.5" />
+                            Pause Runner
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Helper Keyboard Tag */}
+                      <div className="text-[11px] text-[#9A684D] flex items-center gap-1">
+                        <span>⌨️ Spacebar sends & moves to next</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Enhanced Queue Table */}
+                  <div className="overflow-x-auto rounded-xl border border-[#D0B7B2]/40">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="border-b border-[#D0B7B2]/40 bg-[#FAF3F1]/80 text-[#4F4140]">
+                          <th className="p-3 font-bold">#</th>
+                          <th className="p-3 font-bold">Status</th>
+                          <th className="p-3 font-bold">Name</th>
+                          <th className="p-3 font-bold">Phone Number</th>
+                          <th className="p-3 font-bold">Personalized Message Preview</th>
+                          <th className="p-3 font-bold text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 bg-white">
+                        {contacts.map((contact, idx) => {
+                          const compiledMsg = getCompiledMessage(contact.name);
+                          const waLink = generateWaMeLink(contact.phone, compiledMsg);
+                          const isCurrentRunnerTarget = runnerActive && runnerIndex === idx;
+
+                          return (
+                            <tr
+                              key={contact.id}
+                              className={`transition ${
+                                isCurrentRunnerTarget
+                                  ? 'bg-[#BD4935]/10 border-l-4 border-l-[#BD4935]'
+                                  : contact.status === 'sent'
+                                  ? 'bg-emerald-50/40'
+                                  : 'hover:bg-gray-50'
+                              }`}
+                            >
+                              <td className="p-3 text-gray-400 font-mono">{idx + 1}</td>
+                              <td className="p-3">
+                                {contact.status === 'sent' ? (
+                                  <button
+                                    onClick={() => {
+                                      setContacts((prev) =>
+                                        prev.map((c, i) => (i === idx ? { ...c, status: 'idle' } : c))
+                                      );
+                                    }}
+                                    title="Click to mark as pending"
+                                    className="px-2 py-0.5 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-[10px] font-bold inline-flex items-center gap-1 cursor-pointer transition"
+                                  >
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                    Sent
+                                  </button>
+                                ) : isCurrentRunnerTarget ? (
+                                  <span className="px-2 py-0.5 rounded-full bg-[#BD4935] text-white text-[10px] font-bold inline-flex items-center gap-1 animate-pulse">
+                                    🎯 Next Up
+                                  </span>
+                                ) : (
+                                  <button
+                                    onClick={() => {
+                                      setContacts((prev) =>
+                                        prev.map((c, i) => (i === idx ? { ...c, status: 'sent' } : c))
+                                      );
+                                    }}
+                                    title="Click to mark as sent"
+                                    className="px-2 py-0.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 text-[10px] font-medium inline-flex items-center gap-1 cursor-pointer transition"
+                                  >
+                                    Pending
+                                  </button>
+                                )}
+                              </td>
+                              <td className="p-3 font-bold text-[#4F4140]">{contact.name}</td>
+                              <td className="p-3 font-mono text-gray-600">
+                                {contact.phone || contact.rawPhone}
+                                {!contact.isValid && (
+                                  <span className="ml-1 text-[10px] text-red-500">(invalid)</span>
+                                )}
+                              </td>
+                              <td className="p-3 text-gray-600 max-w-md truncate" title={compiledMsg}>
+                                {compiledMsg}
+                              </td>
+                              <td className="p-3 text-right">
+                                <div className="flex items-center justify-end gap-2">
+                                  <button
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(compiledMsg);
+                                      setCopiedLinkIndex(idx);
+                                      setTimeout(() => setCopiedLinkIndex(null), 2000);
+                                    }}
+                                    title="Copy personalized text"
+                                    className="p-1.5 text-gray-400 hover:text-[#4F4140] rounded-md transition"
+                                  >
+                                    {copiedLinkIndex === idx ? (
+                                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                    ) : (
+                                      <Copy className="w-3.5 h-3.5" />
+                                    )}
+                                  </button>
+
+                                  <a
+                                    href={waLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={() => {
+                                      setContacts((prev) =>
+                                        prev.map((c, i) => (i === idx ? { ...c, status: 'sent' } : c))
+                                      );
+                                    }}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#25D366] hover:bg-[#1EBE5D] text-white rounded-lg font-semibold text-xs transition shadow-xs cursor-pointer"
+                                  >
+                                    <PhoneCall className="w-3 h-3" />
+                                    Send to {contact.name.split(' ')[0]}
+                                    <ExternalLink className="w-2.5 h-2.5 opacity-70" />
+                                  </a>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>
