@@ -29,6 +29,7 @@ import {
   generateWaMeLink,
   parseContactsCsv,
 } from '@/lib/whatsapp';
+import AdminGuard from '@/components/admin/AdminGuard';
 
 export default function WhatsAppBroadcastPage() {
   const fileInputId = useId();
@@ -291,7 +292,8 @@ Bextery,07067436817`;
   const failedCount = contacts.filter((c) => c.status === 'failed').length;
 
   return (
-    <div className="min-h-screen bg-[#FAF3F1] text-[#4F4140] font-sans">
+    <AdminGuard>
+      <div className="bg-[#FAF3F1] text-[#4F4140] font-sans pb-16">
       {/* Top Header */}
       <header className="bg-white border-b border-[#D0B7B2]/40 shadow-xs sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
@@ -1195,6 +1197,7 @@ WHATSAPP_TEMPLATE_LANG="en_US"`}
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </AdminGuard>
   );
 }

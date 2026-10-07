@@ -1,80 +1,82 @@
 'use client';
 
-import { useState } from 'react';
-import { Sparkles, HeartPulse, Check, ArrowRight, ShoppingCart } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Sparkles, HeartPulse, Check, ArrowRight, ShoppingCart, AlertCircle } from 'lucide-react';
+import { Product } from '@/lib/products';
 
-interface Product {
-  id: string;
-  name: string;
-  badge: string;
-  description: string;
-  priceNote: string;
-  category: 'bestseller' | 'clinical';
-  flavorOptions?: string[];
-  gradient: string;
-}
-
-const products: Product[] = [
+const defaultSeedProducts: Product[] = [
   // Wing A: Current Bestsellers
   {
     id: 'foil-cake',
     name: 'Gourmet Foil Cake',
     badge: 'Campus & Office Favorite',
     description: 'Freshly baked single or sharing sponge in a sealed foil pan. Incredibly moist, stays fresh, and travel-safe across Ibadan.',
+    price: 3500,
     priceNote: 'From ₦3,500',
     category: 'bestseller',
     flavorOptions: ['Rich Chocolate Fudge', 'Classic Red Velvet', 'Vanilla Bean Swirl', 'Cookies & Cream'],
     gradient: 'from-[#BD4935] to-[#9A684D]',
+    isAvailable: true,
   },
   {
     id: 'red-velvet',
     name: 'Signature Moist Red Velvet',
     badge: '#1 Crowd Favorite',
     description: 'Our legendary deep red crumb balanced with real buttermilk and topped with silky, tangy cream cheese frosting.',
+    price: 8000,
     priceNote: 'From ₦8,000 (Bento) / ₦22,000 (8-inch)',
     category: 'bestseller',
     flavorOptions: ['Classic Cream Cheese', 'Whipped Vanilla Buttercream', 'Red Velvet Fudge'],
     gradient: 'from-[#9A684D] to-[#BD4935]',
+    isAvailable: true,
   },
   {
     id: 'chocolate-fudge',
     name: 'Decadent Fudgy Chocolate',
     badge: 'Pure Indulgence',
     description: 'Rich dark cocoa sponge infused with coffee notes for maximum chocolate depth. Soft, velvety, and deeply satisfying.',
+    price: 8000,
     priceNote: 'From ₦8,000 (Bento) / ₦22,000 (8-inch)',
     category: 'bestseller',
     flavorOptions: ['Dark Chocolate Ganache', 'Nutella Swirl', 'Salted Caramel Drizzle'],
     gradient: 'from-[#4F4140] to-[#9A684D]',
+    isAvailable: true,
   },
   {
     id: 'parfait',
     name: 'Layered Greek Yogurt Parfait',
     badge: '100% Zero Food-Waste',
     description: 'Creamy artisan Greek yogurt layered with house-toasted granola, fruit coulis, and moist Bextery cake crumbs.',
+    price: 2500,
     priceNote: 'From ₦2,500 (Cup) / ₦4,500 (Jumbo)',
     category: 'bestseller',
     flavorOptions: ['Strawberry Coulis & Red Velvet', 'Mango-Passionfruit & Vanilla', 'Blueberry Crunch'],
     gradient: 'from-[#BD4935] to-[#D0B7B2]',
+    isAvailable: true,
   },
   {
     id: 'celebration-bespoke',
     name: 'Custom Celebration Cake',
     badge: 'Milestones & Events',
     description: 'Multi-layer birthday, anniversary, and graduation cakes designed with precision, bespoke toppers, and clean finishes.',
+    price: 25000,
     priceNote: 'Custom quote based on tiers',
     category: 'bestseller',
     flavorOptions: ['Red Velvet + Chocolate Duo', 'Vanilla Caramel', 'Fruit & Cream'],
     gradient: 'from-[#D0B7B2] to-[#4F4140]',
+    isAvailable: true,
   },
   {
     id: 'donuts-pastries',
     name: 'Glazed Donuts & Pastry Box',
     badge: 'Snack & Share',
     description: 'Soft, airy brioche-style donuts and curated snack boxes. Handcrafted in limited daily batches for optimal fluffiness.',
+    price: 6000,
     priceNote: 'Box of 4 / Box of 6',
     category: 'bestseller',
     flavorOptions: ['Classic Glaze', 'Chocolate Dip', 'Cinnamon Sugar'],
     gradient: 'from-[#9A684D] to-[#4F4140]',
+    isAvailable: true,
   },
 
   // Wing B: Clinical & Therapeutic Nutrition Line
@@ -83,45 +85,69 @@ const products: Product[] = [
     name: 'Diabetic-Friendly Low-GI Sponge',
     badge: 'Clinical Formulation (Rx)',
     description: 'Formulated specifically for diabetics and elders. Zero refined sugar, sweetened with pure erythritol/monk fruit, low glycemic load.',
+    price: 12000,
     priceNote: 'Formulated to order',
     category: 'clinical',
     flavorOptions: ['Almond Vanilla Bean', 'Pure Cocoa Fudge (Sugar-Free)', 'Spiced Cinnamon'],
     gradient: 'from-emerald-800 to-teal-950',
+    isAvailable: true,
   },
   {
     id: 'oat-tigernut-bread',
     name: 'High-Fiber Oat & Tigernut Loaf',
     badge: 'Indigenous Agro-Grain',
     description: 'Nutrient-packed artisanal loaf combining local tigernut (aya) natural prebiotic sweetness with rolled oat fiber. Heart-healthy and filling.',
+    price: 4500,
     priceNote: 'Weekly batch bake',
     category: 'clinical',
     flavorOptions: ['Classic Oat & Tigernut', 'Golden Honey & Seed Blend'],
     gradient: 'from-amber-800 to-stone-900',
+    isAvailable: true,
   },
   {
     id: 'gluten-allergen-safe',
     name: 'Gluten-Safe / Celiac Pastry Box',
     badge: 'Allergen Conscious',
     description: 'Baked in a dedicated allergen-conscious cycle for customers with gluten sensitivities, PCOS, or celiac requirements.',
+    price: 15000,
     priceNote: 'Custom dietary consult',
     category: 'clinical',
     flavorOptions: ['Almond Flour Muffins', 'Coconut Flour Brownies'],
     gradient: 'from-teal-900 to-stone-900',
+    isAvailable: true,
   },
 ];
 
 export default function Menu() {
+  const [productList, setProductList] = useState<Product[]>(defaultSeedProducts);
   const [activeTab, setActiveTab] = useState<'bestseller' | 'clinical'>('bestseller');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedFlavor, setSelectedFlavor] = useState<string>('');
   const [deliveryArea, setDeliveryArea] = useState<string>('Bodija');
   const [customerNote, setCustomerNote] = useState<string>('');
 
-  const filteredProducts = products.filter((p) => p.category === activeTab);
+  // Fetch live updated products from API
+  useEffect(() => {
+    async function loadLiveProducts() {
+      try {
+        const res = await fetch('/api/products');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.products) && data.products.length > 0) {
+          setProductList(data.products);
+        }
+      } catch (err) {
+        console.warn('Using seeded catalog products:', err);
+      }
+    }
+    loadLiveProducts();
+  }, []);
+
+  const filteredProducts = productList.filter((p) => p.category === activeTab);
 
   const handleSelectProduct = (product: Product) => {
+    if (!product.isAvailable) return;
     setSelectedProduct(product);
-    setSelectedFlavor(product.flavorOptions ? product.flavorOptions[0] : '');
+    setSelectedFlavor(product.flavorOptions && product.flavorOptions.length > 0 ? product.flavorOptions[0] : '');
   };
 
   const generateWhatsAppUrl = () => {
@@ -198,19 +224,41 @@ Please confirm availability and the invoice details. Thank you!`;
             >
               <div>
                 {/* Visual Header */}
-                <div className={`w-full h-44 bg-gradient-to-br ${product.gradient} p-5 flex flex-col justify-between text-white relative`}>
-                  <div className="flex justify-between items-start">
-                    <span className="text-[10px] font-bold uppercase tracking-wider bg-black/30 backdrop-blur-xs px-3 py-1 rounded-full">
+                <div
+                  className={`w-full h-48 p-5 flex flex-col justify-between text-white relative overflow-hidden ${
+                    !product.image ? `bg-gradient-to-br ${product.gradient}` : 'bg-gray-900'
+                  }`}
+                >
+                  {product.image && (
+                    <div className="absolute inset-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/25" />
+                    </div>
+                  )}
+
+                  <div className="flex justify-between items-start relative z-10">
+                    <span className="text-[10px] font-bold uppercase tracking-wider bg-black/40 backdrop-blur-xs px-3 py-1 rounded-full border border-white/20">
                       {product.badge}
                     </span>
-                    <span className="text-xs font-semibold bg-white/20 px-2.5 py-0.5 rounded-full">
+                    <span className="text-xs font-semibold bg-white/20 backdrop-blur-xs px-2.5 py-0.5 rounded-full border border-white/10">
                       {product.priceNote}
                     </span>
                   </div>
-                  <div>
-                    <h3 className="text-2xl font-display font-bold leading-tight">
+
+                  <div className="relative z-10">
+                    <h3 className="text-2xl font-display font-bold leading-tight drop-shadow-xs">
                       {product.name}
                     </h3>
+                    {!product.isAvailable && (
+                      <span className="inline-block mt-1 text-[10px] font-bold uppercase tracking-wider bg-red-600/90 text-white px-2.5 py-0.5 rounded-md shadow-xs">
+                        Sold Out For Today
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -243,15 +291,18 @@ Please confirm availability and the invoice details. Thank you!`;
               {/* Card Footer Button */}
               <div className="p-6 pt-0">
                 <button
+                  disabled={!product.isAvailable}
                   onClick={() => handleSelectProduct(product)}
                   className={`w-full py-3.5 px-4 rounded-xl font-body font-semibold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
-                    product.category === 'clinical'
-                      ? 'bg-emerald-800 text-white hover:bg-emerald-900'
-                      : 'bg-brand-red text-white hover:bg-brand-brown'
+                    !product.isAvailable
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : product.category === 'clinical'
+                      ? 'bg-emerald-800 text-white hover:bg-emerald-900 cursor-pointer shadow-xs'
+                      : 'bg-brand-red text-white hover:bg-brand-brown cursor-pointer shadow-xs'
                   }`}
                 >
                   <ShoppingCart className="w-4 h-4" />
-                  Customize & Order
+                  {product.isAvailable ? 'Customize & Order' : 'Temporarily Out of Stock'}
                 </button>
               </div>
             </div>
