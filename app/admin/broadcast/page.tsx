@@ -44,7 +44,7 @@ export default function WhatsAppBroadcastPage() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [rawText, setRawText] = useState('');
   const [showPasteModal, setShowPasteModal] = useState(false);
-  const [filterValidStatus, setFilterValidStatus] = useState<'all' | 'valid' | 'invalid'>('all');
+  const [filterValidStatus, setFilterValidStatus] = useState<'all' | 'valid' | 'invalid' | 'selected' | 'deselected'>('all');
 
   // Inline editing state for fixing contact phone numbers
   const [editingContactId, setEditingContactId] = useState<string | null>(null);
@@ -145,6 +145,44 @@ Bextery,07067436817`;
     addLog('Updated phone number for contact', 'info');
   };
 
+  // Contact Selection Calculations & Handlers
+  const selectedContacts = contacts.filter((c) => c.selected !== false);
+  const selectedCount = selectedContacts.length;
+  const selectedValidCount = selectedContacts.filter((c) => c.isValid).length;
+  const selectedValidUnsentCount = selectedContacts.filter((c) => c.isValid && c.status !== 'sent').length;
+
+  const toggleSelectContact = (id: string) => {
+    setContacts((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, selected: !(c.selected !== false) } : c))
+    );
+  };
+
+  const selectAllContacts = (select: boolean = true) => {
+    setContacts((prev) => prev.map((c) => ({ ...c, selected: select })));
+    addLog(select ? 'Selected all contacts' : 'Deselected all contacts', 'info');
+  };
+
+  const selectOnlyValidContacts = () => {
+    setContacts((prev) => prev.map((c) => ({ ...c, selected: c.isValid })));
+    addLog('Selected only valid contacts (Ready to Send)', 'info');
+  };
+
+  const deleteDeselectedContacts = () => {
+    const deselectedCount = contacts.length - selectedCount;
+    if (deselectedCount === 0) return;
+    if (!window.confirm(`Remove ${deselectedCount} deselected contact${deselectedCount > 1 ? 's' : ''} from the queue?`)) return;
+    setContacts((prev) => prev.filter((c) => c.selected !== false));
+    addLog(`Removed ${deselectedCount} deselected contacts`, 'info');
+  };
+
+  const deleteSingleContact = (id: string) => {
+    const target = contacts.find((c) => c.id === id);
+    setContacts((prev) => prev.filter((c) => c.id !== id));
+    if (target) {
+      addLog(`Removed ${target.name} from queue`, 'info');
+    }
+  };
+
   // Helper to compile the personalized message
   const getCompiledMessage = useCallback((name: string) => {
     return messageTemplate.replace(/\{name\}/gi, name || 'Valued Customer');
@@ -155,7 +193,7 @@ Bextery,07067436817`;
     if (contacts.length === 0) return;
 
     const currentContact = contacts[runnerIndex];
-    if (currentContact && currentContact.isValid) {
+    if (currentContact && currentContact.isValid && currentContact.selected !== false) {
       const compiledMsg = getCompiledMessage(currentContact.name);
       const waLink = generateWaMeLink(currentContact.phone, compiledMsg);
       window.open(waLink, '_blank');
@@ -166,30 +204,34 @@ Bextery,07067436817`;
       addLog(`✓ Opened chat for ${currentContact.name} (${currentContact.phone})`, 'success');
     }
 
-    // Find next contact that is valid and not yet sent
+    // Find next contact that is valid, selected, and not yet sent
     const nextIdx = contacts.findIndex(
-      (c, idx) => idx > runnerIndex && c.isValid && c.status !== 'sent'
+      (c, idx) => idx > runnerIndex && c.selected !== false && c.isValid && c.status !== 'sent'
     );
 
     if (nextIdx !== -1) {
       setRunnerIndex(nextIdx);
     } else {
       // Check if there are any remaining unsent before current runnerIndex
-      const anyRemaining = contacts.findIndex((c) => c.isValid && c.status !== 'sent');
+      const anyRemaining = contacts.findIndex((c) => c.selected !== false && c.isValid && c.status !== 'sent');
       if (anyRemaining !== -1 && anyRemaining !== runnerIndex) {
         setRunnerIndex(anyRemaining);
       } else {
         setRunnerActive(false);
-        addLog('🎉 1-Click Bulk Queue Completed! All contacts have been reached.', 'success');
+        addLog('🎉 1-Click Bulk Queue Completed! All selected contacts have been reached.', 'success');
       }
     }
   }, [contacts, runnerIndex, getCompiledMessage]);
 
   // Start the Auto-Runner
   const startRunner = () => {
-    const firstPendingIdx = contacts.findIndex((c) => c.isValid && c.status !== 'sent');
+    const firstPendingIdx = contacts.findIndex((c) => c.selected !== false && c.isValid && c.status !== 'sent');
     if (firstPendingIdx === -1) {
-      alert('All contacts are already marked as sent! Click "Reset Queue" to start over.');
+      if (selectedCount === 0) {
+        alert('All contacts are deselected! Select at least one contact to start the queue.');
+      } else {
+        alert('All selected contacts are already marked as sent! Click "Reset Queue" to start over.');
+      }
       return;
     }
     setRunnerIndex(firstPendingIdx);
@@ -200,7 +242,7 @@ Bextery,07067436817`;
   // Skip current contact
   const skipRunnerContact = () => {
     const nextIdx = contacts.findIndex(
-      (c, idx) => idx > runnerIndex && c.isValid && c.status !== 'sent'
+      (c, idx) => idx > runnerIndex && c.selected !== false && c.isValid && c.status !== 'sent'
     );
     if (nextIdx !== -1) {
       setRunnerIndex(nextIdx);
@@ -249,18 +291,22 @@ Bextery,07067436817`;
 
   // Automated Meta Cloud API Broadcast Sender
   const startMetaBroadcast = async () => {
-    const validContacts = contacts.filter((c) => c.isValid && c.status !== 'sent');
+    const validContacts = contacts.filter((c) => c.selected !== false && c.isValid && c.status !== 'sent');
     if (validContacts.length === 0) {
-      alert('No valid pending contacts to send to.');
+      if (selectedCount === 0) {
+        alert('All contacts are deselected! Select at least one contact to start the broadcast.');
+      } else {
+        alert('No valid selected pending contacts to send to.');
+      }
       return;
     }
 
     setIsSending(true);
-    addLog(`Starting broadcast to ${validContacts.length} contacts...`, 'info');
+    addLog(`Starting broadcast to ${validContacts.length} selected contacts...`, 'info');
 
     for (let i = 0; i < contacts.length; i++) {
       const contact = contacts[i];
-      if (!contact.isValid || contact.status === 'sent') continue;
+      if (contact.selected === false || !contact.isValid || contact.status === 'sent') continue;
 
       setCurrentSendIndex(i);
       setContacts((prev) =>
@@ -492,6 +538,28 @@ Bextery,07067436817`;
                       </div>
                     </div>
 
+                    {/* Select / Deselect Bar */}
+                    <div className="flex items-center justify-between text-xs py-1 px-1 text-gray-500">
+                      <span className="font-semibold text-[#4F4140]">
+                        {selectedCount} of {contacts.length} selected
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => selectAllContacts(true)}
+                          className="text-xs text-[#BD4935] hover:underline font-semibold"
+                        >
+                          Select All
+                        </button>
+                        <span>&bull;</span>
+                        <button
+                          onClick={() => selectAllContacts(false)}
+                          className="text-xs text-gray-500 hover:underline"
+                        >
+                          Deselect All
+                        </button>
+                      </div>
+                    </div>
+
                     {/* Compact Scrollable Contacts Table */}
                     <div className="max-h-56 overflow-y-auto rounded-xl border border-[#D0B7B2]/40 divide-y divide-gray-100 text-xs">
                       {contacts.map((contact, idx) => (
@@ -499,17 +567,29 @@ Bextery,07067436817`;
                           key={contact.id}
                           onClick={() => setPreviewContactIndex(idx)}
                           className={`p-2.5 flex items-center justify-between cursor-pointer transition ${
-                            previewContactIndex === idx
+                            contact.selected === false
+                              ? 'opacity-55 bg-gray-50/70'
+                              : previewContactIndex === idx
                               ? 'bg-[#FAF3F1] border-l-4 border-l-[#BD4935]'
                               : 'hover:bg-gray-50'
                           }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
+                            <input
+                              type="checkbox"
+                              checked={contact.selected !== false}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                toggleSelectContact(contact.id);
+                              }}
+                              title={contact.selected !== false ? 'Deselect contact' : 'Select contact'}
+                              className="w-3.5 h-3.5 rounded text-[#BD4935] focus:ring-[#BD4935]/30 cursor-pointer accent-[#BD4935]"
+                            />
                             <span className="w-5 text-gray-400 font-mono text-[10px]">
                               {idx + 1}.
                             </span>
                             <div className="truncate">
-                              <p className="font-semibold text-[#4F4140] truncate">
+                              <p className={`font-semibold truncate ${contact.selected === false ? 'line-through text-gray-400' : 'text-[#4F4140]'}`}>
                                 {contact.name}
                               </p>
                               <p className="text-[11px] text-gray-500 font-mono">
@@ -671,7 +751,7 @@ Bextery,07067436817`;
                 {/* Send Button */}
                 <div className="space-y-2">
                   <button
-                    disabled={isSending || contacts.length === 0}
+                    disabled={isSending || selectedValidUnsentCount === 0}
                     onClick={startMetaBroadcast}
                     className="w-full py-3 px-4 bg-[#BD4935] hover:bg-[#a63e2c] disabled:opacity-50 text-white rounded-xl font-bold text-sm transition shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                   >
@@ -683,7 +763,7 @@ Bextery,07067436817`;
                     ) : (
                       <>
                         <Play className="w-4 h-4 fill-white" />
-                        Send Broadcast ({validCount} contacts)
+                        Send Broadcast ({selectedValidUnsentCount} selected contacts)
                       </>
                     )}
                   </button>
@@ -750,7 +830,7 @@ Bextery,07067436817`;
               <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-gray-100">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-[#4F4140]">Filter:</span>
-                  <div className="flex items-center gap-1 bg-[#FAF3F1] p-0.5 rounded-lg border border-[#D0B7B2]/40 text-xs font-medium">
+                  <div className="flex flex-wrap items-center gap-1 bg-[#FAF3F1] p-0.5 rounded-lg border border-[#D0B7B2]/40 text-xs font-medium">
                     <button
                       onClick={() => setFilterValidStatus('all')}
                       className={`px-2.5 py-1 rounded-md transition ${
@@ -770,8 +850,30 @@ Bextery,07067436817`;
                       }`}
                     >
                       <CheckCircle2 className="w-3 h-3" />
-                      Ready to Send ({validCount})
+                      Ready ({validCount})
                     </button>
+                    <button
+                      onClick={() => setFilterValidStatus('selected')}
+                      className={`px-2.5 py-1 rounded-md transition flex items-center gap-1 ${
+                        filterValidStatus === 'selected'
+                          ? 'bg-[#BD4935] text-white shadow-2xs font-semibold'
+                          : 'text-[#BD4935] hover:bg-white/60'
+                      }`}
+                    >
+                      Selected ({selectedCount})
+                    </button>
+                    {contacts.length - selectedCount > 0 && (
+                      <button
+                        onClick={() => setFilterValidStatus('deselected')}
+                        className={`px-2.5 py-1 rounded-md transition flex items-center gap-1 ${
+                          filterValidStatus === 'deselected'
+                            ? 'bg-gray-700 text-white shadow-2xs font-semibold'
+                            : 'text-gray-600 hover:bg-white/60'
+                        }`}
+                      >
+                        Deselected ({contacts.length - selectedCount})
+                      </button>
+                    )}
                     {contacts.length - validCount > 0 && (
                       <button
                         onClick={() => setFilterValidStatus('invalid')}
@@ -925,10 +1027,10 @@ Bextery,07067436817`;
                     {/* Progress Bar & Counters */}
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs font-semibold text-[#4F4140]">
-                        <span>Queue Progress: {contacts.filter((c) => c.status === 'sent').length} of {contacts.length} sent</span>
+                        <span>Queue Progress: {contacts.filter((c) => c.status === 'sent').length} of {selectedCount} selected sent</span>
                         <span className="text-[#BD4935]">
-                          {contacts.length > 0
-                            ? Math.round((contacts.filter((c) => c.status === 'sent').length / contacts.length) * 100)
+                          {selectedCount > 0
+                            ? Math.round((contacts.filter((c) => c.status === 'sent').length / selectedCount) * 100)
                             : 0}%
                         </span>
                       </div>
@@ -937,8 +1039,8 @@ Bextery,07067436817`;
                           className="h-full bg-[#BD4935] transition-all duration-300 rounded-full"
                           style={{
                             width: `${
-                              contacts.length > 0
-                                ? (contacts.filter((c) => c.status === 'sent').length / contacts.length) * 100
+                              selectedCount > 0
+                                ? (contacts.filter((c) => c.status === 'sent').length / selectedCount) * 100
                                 : 0
                             }%`,
                           }}
@@ -952,11 +1054,11 @@ Bextery,07067436817`;
                         <div className="flex flex-wrap items-center gap-3">
                           <button
                             onClick={startRunner}
-                            disabled={validCount === 0}
+                            disabled={selectedValidUnsentCount === 0}
                             className="px-5 py-2.5 bg-[#BD4935] hover:bg-[#a63e2c] disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                           >
                             <Play className="w-4 h-4 fill-white" />
-                            Start Bulk Auto-Runner ({validCount} ready)
+                            Start Bulk Auto-Runner ({selectedValidUnsentCount} selected ready)
                           </button>
                           <button
                             onClick={resetQueueStatuses}
@@ -1004,12 +1106,82 @@ Bextery,07067436817`;
                     </div>
                   </div>
 
+                  {/* Batch Selection Action Bar */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white rounded-xl border border-[#D0B7B2]/40 text-xs shadow-2xs">
+                    <div className="flex items-center gap-2.5">
+                      <input
+                        type="checkbox"
+                        checked={contacts.length > 0 && selectedCount === contacts.length}
+                        ref={(el) => {
+                          if (el) {
+                            el.indeterminate = selectedCount > 0 && selectedCount < contacts.length;
+                          }
+                        }}
+                        onChange={(e) => selectAllContacts(e.target.checked)}
+                        title={selectedCount === contacts.length ? 'Deselect All' : 'Select All'}
+                        className="w-4 h-4 rounded text-[#BD4935] focus:ring-[#BD4935]/30 cursor-pointer accent-[#BD4935]"
+                      />
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-bold text-[#4F4140]">
+                          {selectedCount} of {contacts.length} Selected
+                        </span>
+                        <span className="text-gray-400">&bull;</span>
+                        <span className="text-emerald-700 font-semibold">{selectedValidCount} Ready to Send</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={() => selectAllContacts(true)}
+                        className="px-2.5 py-1 bg-[#FAF3F1] hover:bg-white border border-[#D0B7B2]/60 rounded-lg text-xs font-semibold text-[#4F4140] transition"
+                      >
+                        Select All
+                      </button>
+                      <button
+                        onClick={() => selectAllContacts(false)}
+                        className="px-2.5 py-1 bg-[#FAF3F1] hover:bg-white border border-[#D0B7B2]/60 rounded-lg text-xs font-semibold text-[#4F4140] transition"
+                      >
+                        Deselect All
+                      </button>
+                      <button
+                        onClick={selectOnlyValidContacts}
+                        className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg text-xs font-semibold text-emerald-800 transition"
+                      >
+                        Select Valid Only
+                      </button>
+                      {contacts.length - selectedCount > 0 && (
+                        <button
+                          onClick={deleteDeselectedContacts}
+                          className="px-2.5 py-1 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg text-xs font-semibold text-red-700 transition flex items-center gap-1"
+                          title="Permanently remove deselected contacts from list"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          Remove Deselected ({contacts.length - selectedCount})
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
                   {/* Enhanced Queue Table */}
                   <div className="overflow-x-auto rounded-xl border border-[#D0B7B2]/40">
                     <table className="w-full text-left text-xs">
                       <thead>
                         <tr className="border-b border-[#D0B7B2]/40 bg-[#FAF3F1]/80 text-[#4F4140]">
-                          <th className="p-3 font-bold">#</th>
+                          <th className="p-3 w-10 text-center">
+                            <input
+                              type="checkbox"
+                              checked={contacts.length > 0 && selectedCount === contacts.length}
+                              ref={(el) => {
+                                if (el) {
+                                  el.indeterminate = selectedCount > 0 && selectedCount < contacts.length;
+                                }
+                              }}
+                              onChange={(e) => selectAllContacts(e.target.checked)}
+                              title={selectedCount === contacts.length ? 'Deselect All' : 'Select All'}
+                              className="w-4 h-4 rounded text-[#BD4935] focus:ring-[#BD4935]/30 cursor-pointer accent-[#BD4935]"
+                            />
+                          </th>
+                          <th className="p-3 font-bold w-12">#</th>
                           <th className="p-3 font-bold">Status</th>
                           <th className="p-3 font-bold">Name</th>
                           <th className="p-3 font-bold">Phone Number</th>
@@ -1022,6 +1194,8 @@ Bextery,07067436817`;
                           .filter((c) => {
                             if (filterValidStatus === 'valid') return c.isValid;
                             if (filterValidStatus === 'invalid') return !c.isValid;
+                            if (filterValidStatus === 'selected') return c.selected !== false;
+                            if (filterValidStatus === 'deselected') return c.selected === false;
                             return true;
                           })
                           .map((contact, idx) => {
@@ -1034,14 +1208,25 @@ Bextery,07067436817`;
                               <tr
                                 key={contact.id}
                                 className={`transition ${
-                                  isCurrentRunnerTarget
+                                  contact.selected === false
+                                    ? 'opacity-55 bg-gray-50/80'
+                                    : isCurrentRunnerTarget
                                     ? 'bg-[#BD4935]/10 border-l-4 border-l-[#BD4935]'
                                     : contact.status === 'sent'
                                     ? 'bg-emerald-50/40'
                                     : 'hover:bg-gray-50'
                                 }`}
                               >
-                                <td className="p-3 text-gray-400 font-mono">{idx + 1}</td>
+                                <td className="p-3 text-center" onClick={(e) => e.stopPropagation()}>
+                                  <input
+                                    type="checkbox"
+                                    checked={contact.selected !== false}
+                                    onChange={() => toggleSelectContact(contact.id)}
+                                    title={contact.selected !== false ? 'Deselect contact from queue' : 'Select contact for queue'}
+                                    className="w-4 h-4 rounded text-[#BD4935] focus:ring-[#BD4935]/30 cursor-pointer accent-[#BD4935]"
+                                  />
+                                </td>
+                                <td className="p-3 text-gray-400 font-mono">{originalIdx + 1}</td>
                                 <td className="p-3">
                                   {contact.status === 'sent' ? (
                                     <button
@@ -1074,7 +1259,18 @@ Bextery,07067436817`;
                                     </button>
                                   )}
                                 </td>
-                                <td className="p-3 font-bold text-[#4F4140]">{contact.name}</td>
+                                <td className="p-3 font-bold text-[#4F4140]">
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className={contact.selected === false ? 'line-through text-gray-400 font-normal' : ''}>
+                                      {contact.name}
+                                    </span>
+                                    {contact.selected === false && (
+                                      <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-gray-200 text-gray-600">
+                                        Skipped
+                                      </span>
+                                    )}
+                                  </div>
+                                </td>
                                 <td className="p-3 font-mono text-gray-600">
                                   {editingContactId === contact.id ? (
                                     <div className="flex items-center gap-1">
@@ -1175,6 +1371,14 @@ Bextery,07067436817`;
                                         Fix Number
                                       </button>
                                     )}
+
+                                    <button
+                                      onClick={() => deleteSingleContact(contact.id)}
+                                      title={`Remove ${contact.name} from queue`}
+                                      className="p-1.5 text-gray-300 hover:text-red-600 rounded-md transition"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
                                   </div>
                                 </td>
                               </tr>

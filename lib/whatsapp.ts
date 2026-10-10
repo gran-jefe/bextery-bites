@@ -11,6 +11,7 @@ export interface Contact {
   isValid: boolean;
   status: 'idle' | 'sending' | 'sent' | 'failed';
   errorMessage?: string;
+  selected?: boolean;
 }
 
 /**
@@ -114,6 +115,7 @@ export function parseContactsCsv(inputText: string): Contact[] {
           rawPhone: phone,
           isValid,
           status: 'idle',
+          selected: true,
         });
       }
     });
@@ -257,6 +259,7 @@ export function parseContactsCsv(inputText: string): Contact[] {
       rawPhone,
       isValid,
       status: 'idle',
+      selected: true,
     });
   });
 
