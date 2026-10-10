@@ -23,23 +23,32 @@ import {
   Sparkles,
   PhoneCall,
   Zap,
+  Edit2,
+  Filter,
 } from 'lucide-react';
 import {
   Contact,
   generateWaMeLink,
   parseContactsCsv,
+  formatPhoneNumber,
 } from '@/lib/whatsapp';
 import AdminGuard from '@/components/admin/AdminGuard';
 
 export default function WhatsAppBroadcastPage() {
   const fileInputId = useId();
-  // Active Tab: 'broadcast' | 'wa_me_queue' | 'guide' | 'settings'
-  const [activeTab, setActiveTab] = useState<'broadcast' | 'wa_me_queue' | 'guide' | 'settings'>('broadcast');
+  const queueFileInputId = useId();
+  // Active Tab: default to 1-Click Queue so users don't need Meta API setup
+  const [activeTab, setActiveTab] = useState<'wa_me_queue' | 'broadcast' | 'guide' | 'settings'>('wa_me_queue');
 
   // Contacts State
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [rawText, setRawText] = useState('');
   const [showPasteModal, setShowPasteModal] = useState(false);
+  const [filterValidStatus, setFilterValidStatus] = useState<'all' | 'valid' | 'invalid'>('all');
+
+  // Inline editing state for fixing contact phone numbers
+  const [editingContactId, setEditingContactId] = useState<string | null>(null);
+  const [editingPhoneValue, setEditingPhoneValue] = useState('');
 
   // Message & Template State
   const [templateName, setTemplateName] = useState('bextery_customer_greeting');
@@ -114,6 +123,26 @@ Bextery,07067436817`;
     setContacts([]);
     setCurrentSendIndex(null);
     addLog('Cleared contacts list', 'info');
+  };
+
+  const handleSavePhoneEdit = (contactId: string) => {
+    if (!editingPhoneValue.trim()) return;
+    const { phone, isValid } = formatPhoneNumber(editingPhoneValue);
+    setContacts((prev) =>
+      prev.map((c) =>
+        c.id === contactId
+          ? {
+              ...c,
+              phone,
+              rawPhone: editingPhoneValue.trim(),
+              isValid,
+            }
+          : c
+      )
+    );
+    setEditingContactId(null);
+    setEditingPhoneValue('');
+    addLog('Updated phone number for contact', 'info');
   };
 
   // Helper to compile the personalized message
@@ -321,26 +350,29 @@ Bextery,07067436817`;
           {/* Navigation Tabs */}
           <nav className="flex items-center gap-1 sm:gap-2 bg-[#FAF3F1] p-1 rounded-xl border border-[#D0B7B2]/50 text-xs sm:text-sm font-medium">
             <button
-              onClick={() => setActiveTab('broadcast')}
-              className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
-                activeTab === 'broadcast'
-                  ? 'bg-[#BD4935] text-white shadow-xs'
-                  : 'text-[#4F4140] hover:bg-white/60'
-              }`}
-            >
-              <Send className="w-3.5 h-3.5" />
-              Meta Cloud API
-            </button>
-            <button
               onClick={() => setActiveTab('wa_me_queue')}
               className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
                 activeTab === 'wa_me_queue'
-                  ? 'bg-[#BD4935] text-white shadow-xs'
+                  ? 'bg-[#BD4935] text-white shadow-xs font-semibold'
                   : 'text-[#4F4140] hover:bg-white/60'
               }`}
             >
               <MessageSquare className="w-3.5 h-3.5" />
-              1-Click Queue
+              <span>1-Click Direct Queue</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-300">
+                No API Needed
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('broadcast')}
+              className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                activeTab === 'broadcast'
+                  ? 'bg-[#BD4935] text-white shadow-xs font-semibold'
+                  : 'text-[#4F4140] hover:bg-white/60'
+              }`}
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Meta Cloud API</span>
             </button>
             <button
               onClick={() => setActiveTab('guide')}
@@ -712,29 +744,143 @@ Bextery,07067436817`;
                     Send personalized messages directly from your WhatsApp without waiting for Meta API approvals or incurring per-message fees.
                   </p>
                 </div>
-                {contacts.length === 0 && (
-                  <button
-                    onClick={loadSampleContacts}
-                    className="px-3 py-1.5 bg-[#FAF3F1] border border-[#D0B7B2] text-[#BD4935] rounded-lg text-xs font-semibold hover:bg-white"
+              </div>
+
+              {/* Top Queue Toolbar & Actions */}
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-[#4F4140]">Filter:</span>
+                  <div className="flex items-center gap-1 bg-[#FAF3F1] p-0.5 rounded-lg border border-[#D0B7B2]/40 text-xs font-medium">
+                    <button
+                      onClick={() => setFilterValidStatus('all')}
+                      className={`px-2.5 py-1 rounded-md transition ${
+                        filterValidStatus === 'all'
+                          ? 'bg-[#BD4935] text-white shadow-2xs font-semibold'
+                          : 'text-gray-600 hover:bg-white/60'
+                      }`}
+                    >
+                      All ({contacts.length})
+                    </button>
+                    <button
+                      onClick={() => setFilterValidStatus('valid')}
+                      className={`px-2.5 py-1 rounded-md transition flex items-center gap-1 ${
+                        filterValidStatus === 'valid'
+                          ? 'bg-emerald-700 text-white shadow-2xs font-semibold'
+                          : 'text-emerald-700 hover:bg-white/60'
+                      }`}
+                    >
+                      <CheckCircle2 className="w-3 h-3" />
+                      Ready to Send ({validCount})
+                    </button>
+                    {contacts.length - validCount > 0 && (
+                      <button
+                        onClick={() => setFilterValidStatus('invalid')}
+                        className={`px-2.5 py-1 rounded-md transition flex items-center gap-1 ${
+                          filterValidStatus === 'invalid'
+                            ? 'bg-red-700 text-white shadow-2xs font-semibold'
+                            : 'text-red-600 hover:bg-white/60'
+                        }`}
+                      >
+                        <AlertCircle className="w-3 h-3" />
+                        Needs Phone ({contacts.length - validCount})
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <label
+                    htmlFor={queueFileInputId}
+                    className="cursor-pointer px-3 py-1.5 bg-[#BD4935] text-white rounded-lg text-xs font-semibold hover:bg-[#a63e2c] transition shadow-2xs flex items-center gap-1.5"
                   >
-                    Load Demo Contacts
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>{contacts.length === 0 ? 'Upload Contacts File' : '+ Add / Replace File'}</span>
+                  </label>
+                  <input
+                    id={queueFileInputId}
+                    type="file"
+                    accept=".csv,.vcf,.txt,.tsv"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <button
+                    onClick={() => setShowPasteModal(true)}
+                    className="px-3 py-1.5 border border-[#D0B7B2] bg-white text-[#4F4140] hover:bg-gray-50 rounded-lg text-xs font-semibold transition flex items-center gap-1.5"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-[#9A684D]" />
+                    <span>Paste Text</span>
                   </button>
-                )}
+                  {contacts.length > 0 && (
+                    <button
+                      onClick={clearContacts}
+                      className="px-2.5 py-1.5 text-xs text-red-600 hover:text-red-700 flex items-center gap-1 font-semibold"
+                    >
+                      <Trash2 className="w-3 h-3" /> Clear
+                    </button>
+                  )}
+                </div>
               </div>
 
               {contacts.length === 0 ? (
-                <div className="text-center py-12 border-2 border-dashed border-[#D0B7B2] rounded-xl bg-[#FAF3F1]/30">
-                  <Users className="w-10 h-10 mx-auto text-[#9A684D] mb-3" />
-                  <p className="text-sm font-semibold text-[#4F4140] mb-2">No contacts loaded</p>
-                  <button
-                    onClick={() => setActiveTab('broadcast')}
-                    className="px-4 py-2 bg-[#BD4935] text-white text-xs font-semibold rounded-xl"
-                  >
-                    Upload Contacts CSV in Broadcast Tab
-                  </button>
+                /* Empty state with full uploader */
+                <div className="border-2 border-dashed border-[#D0B7B2] rounded-2xl p-8 text-center bg-[#FAF3F1]/40 space-y-4 my-4">
+                  <div className="w-12 h-12 rounded-full bg-[#BD4935]/10 text-[#BD4935] flex items-center justify-center mx-auto">
+                    <Upload className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-[#4F4140]">
+                      No Contacts Loaded in Queue
+                    </h3>
+                    <p className="text-xs text-[#9A684D] max-w-md mx-auto mt-1">
+                      Upload your contacts exported from Google Contacts, iPhone / Android vCard (.vcf), or a CSV file. Zero Meta API configuration needed!
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                    <label
+                      htmlFor={queueFileInputId}
+                      className="cursor-pointer px-5 py-2.5 bg-[#BD4935] hover:bg-[#a63e2c] text-white rounded-xl text-xs font-semibold transition shadow-xs flex items-center gap-2"
+                    >
+                      <Upload className="w-4 h-4" /> Choose Contacts File (.csv, .vcf, .txt)
+                    </label>
+                    <button
+                      onClick={() => setShowPasteModal(true)}
+                      className="px-4 py-2.5 border border-[#D0B7B2] bg-white text-[#4F4140] hover:bg-gray-50 rounded-xl text-xs font-semibold transition flex items-center gap-2"
+                    >
+                      <FileText className="w-4 h-4 text-[#9A684D]" /> Paste Names & Numbers
+                    </button>
+                    <button
+                      onClick={loadSampleContacts}
+                      className="px-4 py-2.5 text-xs text-[#BD4935] hover:underline font-semibold"
+                    >
+                      Load Demo Data
+                    </button>
+                  </div>
+                  <div className="pt-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-semibold">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      100% Free &bull; Works directly with your WhatsApp app or WhatsApp Web
+                    </span>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-4">
+                  {/* Collapsible Message Template Box */}
+                  <div className="p-4 rounded-xl bg-white border border-[#D0B7B2]/40 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-[#4F4140] flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-[#BD4935]" />
+                        <span>Message Text to Blast (Dynamic <code className="bg-[#FAF3F1] px-1 py-0.5 rounded text-[#BD4935] font-mono">{'{name}'}</code> will be replaced with customer&apos;s name)</span>
+                      </label>
+                    </div>
+                    <textarea
+                      rows={2}
+                      value={messageTemplate}
+                      onChange={(e) => setMessageTemplate(e.target.value)}
+                      className="w-full text-xs p-2.5 border border-[#D0B7B2]/60 rounded-xl focus:ring-2 focus:ring-[#BD4935]/30 focus:outline-hidden"
+                      placeholder="Type your WhatsApp message..."
+                    />
+                  </div>
+
                   {/* Bulk Auto-Runner Control Deck */}
                   <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#FAF3F1] to-white border border-[#D0B7B2]/60 shadow-xs space-y-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -806,10 +952,11 @@ Bextery,07067436817`;
                         <div className="flex flex-wrap items-center gap-3">
                           <button
                             onClick={startRunner}
-                            className="px-5 py-2.5 bg-[#BD4935] hover:bg-[#a63e2c] text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer"
+                            disabled={validCount === 0}
+                            className="px-5 py-2.5 bg-[#BD4935] hover:bg-[#a63e2c] disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                           >
                             <Play className="w-4 h-4 fill-white" />
-                            Start Bulk Auto-Runner
+                            Start Bulk Auto-Runner ({validCount} ready)
                           </button>
                           <button
                             onClick={resetQueueStatuses}
@@ -852,7 +999,7 @@ Bextery,07067436817`;
 
                       {/* Helper Keyboard Tag */}
                       <div className="text-[11px] text-[#9A684D] flex items-center gap-1">
-                        <span>⌨️ Spacebar sends & moves to next</span>
+                        <span>⌨️ Spacebar or Enter sends & moves to next</span>
                       </div>
                     </div>
                   </div>
@@ -871,103 +1018,168 @@ Bextery,07067436817`;
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100 bg-white">
-                        {contacts.map((contact, idx) => {
-                          const compiledMsg = getCompiledMessage(contact.name);
-                          const waLink = generateWaMeLink(contact.phone, compiledMsg);
-                          const isCurrentRunnerTarget = runnerActive && runnerIndex === idx;
+                        {contacts
+                          .filter((c) => {
+                            if (filterValidStatus === 'valid') return c.isValid;
+                            if (filterValidStatus === 'invalid') return !c.isValid;
+                            return true;
+                          })
+                          .map((contact, idx) => {
+                            const originalIdx = contacts.findIndex((c) => c.id === contact.id);
+                            const compiledMsg = getCompiledMessage(contact.name);
+                            const waLink = generateWaMeLink(contact.phone, compiledMsg);
+                            const isCurrentRunnerTarget = runnerActive && runnerIndex === originalIdx;
 
-                          return (
-                            <tr
-                              key={contact.id}
-                              className={`transition ${
-                                isCurrentRunnerTarget
-                                  ? 'bg-[#BD4935]/10 border-l-4 border-l-[#BD4935]'
-                                  : contact.status === 'sent'
-                                  ? 'bg-emerald-50/40'
-                                  : 'hover:bg-gray-50'
-                              }`}
-                            >
-                              <td className="p-3 text-gray-400 font-mono">{idx + 1}</td>
-                              <td className="p-3">
-                                {contact.status === 'sent' ? (
-                                  <button
-                                    onClick={() => {
-                                      setContacts((prev) =>
-                                        prev.map((c, i) => (i === idx ? { ...c, status: 'idle' } : c))
-                                      );
-                                    }}
-                                    title="Click to mark as pending"
-                                    className="px-2 py-0.5 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-[10px] font-bold inline-flex items-center gap-1 cursor-pointer transition"
-                                  >
-                                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                                    Sent
-                                  </button>
-                                ) : isCurrentRunnerTarget ? (
-                                  <span className="px-2 py-0.5 rounded-full bg-[#BD4935] text-white text-[10px] font-bold inline-flex items-center gap-1 animate-pulse">
-                                    🎯 Next Up
-                                  </span>
-                                ) : (
-                                  <button
-                                    onClick={() => {
-                                      setContacts((prev) =>
-                                        prev.map((c, i) => (i === idx ? { ...c, status: 'sent' } : c))
-                                      );
-                                    }}
-                                    title="Click to mark as sent"
-                                    className="px-2 py-0.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 text-[10px] font-medium inline-flex items-center gap-1 cursor-pointer transition"
-                                  >
-                                    Pending
-                                  </button>
-                                )}
-                              </td>
-                              <td className="p-3 font-bold text-[#4F4140]">{contact.name}</td>
-                              <td className="p-3 font-mono text-gray-600">
-                                {contact.phone || contact.rawPhone}
-                                {!contact.isValid && (
-                                  <span className="ml-1 text-[10px] text-red-500">(invalid)</span>
-                                )}
-                              </td>
-                              <td className="p-3 text-gray-600 max-w-md truncate" title={compiledMsg}>
-                                {compiledMsg}
-                              </td>
-                              <td className="p-3 text-right">
-                                <div className="flex items-center justify-end gap-2">
-                                  <button
-                                    onClick={() => {
-                                      navigator.clipboard.writeText(compiledMsg);
-                                      setCopiedLinkIndex(idx);
-                                      setTimeout(() => setCopiedLinkIndex(null), 2000);
-                                    }}
-                                    title="Copy personalized text"
-                                    className="p-1.5 text-gray-400 hover:text-[#4F4140] rounded-md transition"
-                                  >
-                                    {copiedLinkIndex === idx ? (
-                                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                            return (
+                              <tr
+                                key={contact.id}
+                                className={`transition ${
+                                  isCurrentRunnerTarget
+                                    ? 'bg-[#BD4935]/10 border-l-4 border-l-[#BD4935]'
+                                    : contact.status === 'sent'
+                                    ? 'bg-emerald-50/40'
+                                    : 'hover:bg-gray-50'
+                                }`}
+                              >
+                                <td className="p-3 text-gray-400 font-mono">{idx + 1}</td>
+                                <td className="p-3">
+                                  {contact.status === 'sent' ? (
+                                    <button
+                                      onClick={() => {
+                                        setContacts((prev) =>
+                                          prev.map((c) => (c.id === contact.id ? { ...c, status: 'idle' } : c))
+                                        );
+                                      }}
+                                      title="Click to mark as pending"
+                                      className="px-2 py-0.5 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-[10px] font-bold inline-flex items-center gap-1 cursor-pointer transition"
+                                    >
+                                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                      Sent
+                                    </button>
+                                  ) : isCurrentRunnerTarget ? (
+                                    <span className="px-2 py-0.5 rounded-full bg-[#BD4935] text-white text-[10px] font-bold inline-flex items-center gap-1 animate-pulse">
+                                      🎯 Next Up
+                                    </span>
+                                  ) : (
+                                    <button
+                                      onClick={() => {
+                                        setContacts((prev) =>
+                                          prev.map((c) => (c.id === contact.id ? { ...c, status: 'sent' } : c))
+                                        );
+                                      }}
+                                      title="Click to mark as sent"
+                                      className="px-2 py-0.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 text-[10px] font-medium inline-flex items-center gap-1 cursor-pointer transition"
+                                    >
+                                      Pending
+                                    </button>
+                                  )}
+                                </td>
+                                <td className="p-3 font-bold text-[#4F4140]">{contact.name}</td>
+                                <td className="p-3 font-mono text-gray-600">
+                                  {editingContactId === contact.id ? (
+                                    <div className="flex items-center gap-1">
+                                      <input
+                                        type="text"
+                                        value={editingPhoneValue}
+                                        onChange={(e) => setEditingPhoneValue(e.target.value)}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter') handleSavePhoneEdit(contact.id);
+                                          if (e.key === 'Escape') setEditingContactId(null);
+                                        }}
+                                        placeholder="e.g. 07067436817"
+                                        autoFocus
+                                        className="text-xs px-2 py-1 border border-[#BD4935] rounded-md font-mono w-32 bg-white"
+                                      />
+                                      <button
+                                        onClick={() => handleSavePhoneEdit(contact.id)}
+                                        className="p-1 bg-[#BD4935] text-white rounded-md text-[10px] hover:bg-[#a63e2c]"
+                                        title="Save number"
+                                      >
+                                        <Check className="w-3 h-3" />
+                                      </button>
+                                      <button
+                                        onClick={() => setEditingContactId(null)}
+                                        className="p-1 bg-gray-200 text-gray-700 rounded-md text-[10px] hover:bg-gray-300"
+                                        title="Cancel"
+                                      >
+                                        ✕
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center gap-1.5">
+                                      {contact.isValid ? (
+                                        <span className="font-mono text-gray-700">+{contact.phone}</span>
+                                      ) : (
+                                        <span className="text-[10px] text-red-600 font-semibold flex items-center gap-1 bg-red-50 px-2 py-0.5 rounded-md border border-red-200">
+                                          <AlertCircle className="w-3 h-3" /> No Phone
+                                        </span>
+                                      )}
+                                      <button
+                                        onClick={() => {
+                                          setEditingContactId(contact.id);
+                                          setEditingPhoneValue(contact.phone || contact.rawPhone || '');
+                                        }}
+                                        title="Edit / fix phone number"
+                                        className="text-gray-400 hover:text-[#BD4935] p-1 transition"
+                                      >
+                                        <Edit2 className="w-3 h-3" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </td>
+                                <td className="p-3 text-gray-600 max-w-md truncate" title={compiledMsg}>
+                                  {compiledMsg}
+                                </td>
+                                <td className="p-3 text-right">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <button
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(compiledMsg);
+                                        setCopiedLinkIndex(originalIdx);
+                                        setTimeout(() => setCopiedLinkIndex(null), 2000);
+                                      }}
+                                      title="Copy personalized text"
+                                      className="p-1.5 text-gray-400 hover:text-[#4F4140] rounded-md transition"
+                                    >
+                                      {copiedLinkIndex === originalIdx ? (
+                                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                      ) : (
+                                        <Copy className="w-3.5 h-3.5" />
+                                      )}
+                                    </button>
+
+                                    {contact.isValid ? (
+                                      <a
+                                        href={waLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={() => {
+                                          setContacts((prev) =>
+                                            prev.map((c) => (c.id === contact.id ? { ...c, status: 'sent' } : c))
+                                          );
+                                        }}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#25D366] hover:bg-[#1EBE5D] text-white rounded-lg font-semibold text-xs transition shadow-xs cursor-pointer"
+                                      >
+                                        <PhoneCall className="w-3 h-3" />
+                                        Send to {contact.name.split(' ')[0]}
+                                        <ExternalLink className="w-2.5 h-2.5 opacity-70" />
+                                      </a>
                                     ) : (
-                                      <Copy className="w-3.5 h-3.5" />
+                                      <button
+                                        onClick={() => {
+                                          setEditingContactId(contact.id);
+                                          setEditingPhoneValue(contact.phone || contact.rawPhone || '');
+                                        }}
+                                        className="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-semibold transition"
+                                      >
+                                        Fix Number
+                                      </button>
                                     )}
-                                  </button>
-
-                                  <a
-                                    href={waLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    onClick={() => {
-                                      setContacts((prev) =>
-                                        prev.map((c, i) => (i === idx ? { ...c, status: 'sent' } : c))
-                                      );
-                                    }}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#25D366] hover:bg-[#1EBE5D] text-white rounded-lg font-semibold text-xs transition shadow-xs cursor-pointer"
-                                  >
-                                    <PhoneCall className="w-3 h-3" />
-                                    Send to {contact.name.split(' ')[0]}
-                                    <ExternalLink className="w-2.5 h-2.5 opacity-70" />
-                                  </a>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
                       </tbody>
                     </table>
                   </div>
